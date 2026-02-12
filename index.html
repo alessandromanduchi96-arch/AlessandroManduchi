@@ -1022,15 +1022,15 @@
                             
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="funzionante" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="segnaletica-${item.id}" value="conforme" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Funzionante</span>
+                                    <span style="font-weight: 500;">✅ Conforme</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="manutenzione" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="segnaletica-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Necessita Manutenzione</span>
+                                    <span style="font-weight: 500;">⚠️ Non Conforme</span>
                                 </label>
                             </div>
                             
@@ -1295,7 +1295,7 @@ ${item.hasIdranti ? `
                 const photoBtnId = `photo-btn-${type}-${id}`;
                 const photoBtn = document.getElementById(photoBtnId);
                 if (photoBtn) {
-                    if (value === 'manutenzione' || value === 'non_conforme') {
+                    if (value === 'non_conforme') {
                         photoBtn.style.display = 'block';
                     } else {
                         photoBtn.style.display = 'none';
@@ -1323,7 +1323,7 @@ ${item.hasIdranti ? `
             }
             
             // Check if maintenance selected but no photo yet
-            if (value === 'manutenzione' || value === 'non_conforme') {
+            if (value === 'non_conforme') {
                 const photos = itemData.photosByType?.[type] || [];
                 if (photos.length === 0) {
                     itemData.needsPhoto = itemData.needsPhoto || {};
@@ -1490,11 +1490,11 @@ ${item.hasIdranti ? `
             
             if (itemData.checks) {
                 if (itemData.checks.segnaletica) {
-                    const icon = itemData.checks.segnaletica === 'funzionante' ? '✅' : '⚠️';
+                    const icon = itemData.checks.segnaletica === 'conforme' ? '✅' : '⚠️';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
-                            <span>Segnaletica: ${itemData.checks.segnaletica === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                            <span>Segnaletica: ${itemData.checks.segnaletica === 'conforme' ? 'OK' : 'Non conforme'}</span>
                         </div>
                     `;
                 }
@@ -1701,7 +1701,7 @@ function updatePaginationUI() {
             const totalNiches = checklistData.length;
             const completedNiches = checklistData.filter(i => i.completed).length;
             const needsMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || 
+                return i.checks?.segnaletica === 'non_conforme' || 
                        i.checks?.illuminazione === 'non_conforme' || 
                        i.checks?.camminamento === 'non_conforme' ||
                        i.checks?.corrimano === 'non_conforme' ||
@@ -1718,7 +1718,7 @@ function updatePaginationUI() {
             
             // Summary of maintenance needed
             const nichesNeedingMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || 
+                return i.checks?.segnaletica === 'non_conforme' || 
                        i.checks?.illuminazione === 'non_conforme' || 
                        i.checks?.camminamento === 'non_conforme' ||
                        i.checks?.corrimano === 'non_conforme' ||
@@ -1734,9 +1734,9 @@ function updatePaginationUI() {
                     const niche = filteredNiches.find(n => n.id === item.id);
                     report += `📍 ${niche.km} - Binario ${niche.binario}\n`;
                     
-                    if (item.checks.segnaletica === 'manutenzione') {
+                    if (item.checks.segnaletica === 'non_conforme') {
                         const photoCount = item.photosByType?.segnaletica?.length || 0;
-                        report += `   ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione`;
+                        report += `   ⚠️ SEGNALETICA USCITE EMERGENZA - Non Conforme`;
                         if (photoCount > 0) report += ` (${photoCount} foto)`;
                         report += '\n';
                     }
@@ -1800,7 +1800,7 @@ function updatePaginationUI() {
                 
                 if (item.checks) {
                     if (item.checks.segnaletica) {
-                        const status = item.checks.segnaletica === 'funzionante' ? '✅ Conforme' : '⚠️ Necessita Manutenzione';
+                        const status = item.checks.segnaletica === 'conforme' ? '✅ Conforme' : '⚠️ Non Conforme';
                         report += `   Segnaletica Uscite Emergenza: ${status}\n`;
                     }
                     if (item.checks.illuminazione) {
@@ -1924,7 +1924,7 @@ function updatePaginationUI() {
                                 const label = radio.closest('.radio-label');
                                 if (label) label.style.borderColor = 'var(--primary)';
                                 
-                                if (item.checks.segnaletica === 'manutenzione') {
+                                if (item.checks.segnaletica === 'non_conforme') {
                                     const photoBtn = document.getElementById(`photo-btn-seg-${item.id}`);
                                     if (photoBtn) photoBtn.style.display = 'block';
                                 }
