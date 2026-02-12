@@ -879,16 +879,42 @@
  document.getElementById('loadMoreBtn')?.addEventListener('click', showNextPage);
         });
         
-        // Populate start niche dropdown
+        // Populate start niche dropdown with chunked loading for better performance
         function populateStartNicheSelect() {
             const select = document.getElementById('startNiche');
+            const CHUNK_SIZE = 100; // Process 100 items at a time
+            let currentIndex = 0;
             
-            CHECKLIST_ITEMS.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.textContent = `${item.km} - Binario ${item.binario}`;
-                select.appendChild(option);
-            });
+            function addChunk() {
+                const fragment = document.createDocumentFragment();
+                const endIndex = Math.min(currentIndex + CHUNK_SIZE, CHECKLIST_ITEMS.length);
+                
+                // Create options in batch
+                for (let i = currentIndex; i < endIndex; i++) {
+                    const item = CHECKLIST_ITEMS[i];
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.km} - Binario ${item.binario}`;
+                    fragment.appendChild(option);
+                }
+                
+                // Single DOM append for all options in this chunk
+                select.appendChild(fragment);
+                currentIndex = endIndex;
+                
+                // Schedule next chunk if there are more items
+                if (currentIndex < CHECKLIST_ITEMS.length) {
+                    // Use requestIdleCallback if available, otherwise setTimeout
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(() => addChunk(), { timeout: 100 });
+                    } else {
+                        setTimeout(addChunk, 0);
+                    }
+                }
+            }
+            
+            // Start loading first chunk
+            addChunk();
         }
         
         // Setup start screen
