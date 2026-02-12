@@ -651,6 +651,21 @@
                 </div>
             </div>
             
+            <!-- Download Section -->
+            <div class="submit-section" style="margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 0.75rem; color: var(--text-primary); font-size: 1rem; font-weight: 600;">
+                    Scarica Report
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <button class="btn" style="background: #059669; color: white;" id="downloadTxtBtn">
+                        <span>↓ Scarica TXT</span>
+                    </button>
+                    <button class="btn" style="background: #0891b2; color: white;" id="downloadJsonBtn">
+                        <span>↓ Scarica JSON</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="submit-section">
   <div style="margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.9375rem; font-weight: 500;">
     Destinatario report: <b style="color: var(--text-primary);" id="fixedRecipient">a.manduchi@rfi.it</b>
@@ -846,6 +861,8 @@
             window.addEventListener('online', updateOnlineStatus);
             window.addEventListener('offline', updateOnlineStatus);
             document.getElementById('submitBtn').addEventListener('click', submitReport);
+            document.getElementById('downloadTxtBtn').addEventListener('click', downloadTextFile);
+            document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonFile);
             document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
  document.getElementById('loadMoreBtn')?.addEventListener('click', showNextPage);
         });
@@ -1848,6 +1865,74 @@ function updatePaginationUI() {
             report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
             
             return report;
+        }
+
+        // Download functions
+        function downloadTextFile() {
+            const report = generateReport();
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const filename = `report-verifica-nicchie-${timestamp}.txt`;
+            
+            // Create blob and download
+            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('✓ Report TXT scaricato con successo!', 'success');
+        }
+
+        function downloadJsonFile() {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const filename = `dati-checklist-${timestamp}.json`;
+            
+            // Prepare complete data export
+            const exportData = {
+                metadata: {
+                    exportDate: new Date().toISOString(),
+                    appVersion: '1.0',
+                    startNiche: selectedStartNiche || 'N/A',
+                    direction: selectedDirection || 'N/A',
+                    directionText: selectedDirection === 'san_benedetto' 
+                        ? 'Verso San Benedetto Val di Sambro (55+742)' 
+                        : selectedDirection === 'vernio' 
+                        ? 'Verso Vernio (37+200)' 
+                        : 'N/A'
+                },
+                statistics: {
+                    totalNiches: checklistData.length,
+                    completedNiches: checklistData.filter(i => i.completed).length,
+                    needsMaintenance: checklistData.filter(i => {
+                        return i.checks?.segnaletica === 'non_conforme' || 
+                               i.checks?.illuminazione === 'non_conforme' || 
+                               i.checks?.camminamento === 'non_conforme' ||
+                               i.checks?.corrimano === 'non_conforme' ||
+                               i.checks?.vvf === 'non_conforme' ||
+                               i.checks?.tem === 'non_conforme' ||
+                               i.checks?.idranti === 'non_conforme';
+                    }).length
+                },
+                data: checklistData
+            };
+            
+            // Create blob and download
+            const json = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('✓ Dati JSON scaricati con successo!', 'success');
         }
 
         // LocalStorage functions
