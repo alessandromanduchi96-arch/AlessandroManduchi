@@ -1549,13 +1549,25 @@
             })
             .filter(item => item !== null);
 
+        // Constants
+        const TRACK_FILTER = {
+            BOTH: 'entrambi',
+            PARI: 'pari',
+            DISPARI: 'dispari'
+        };
+        
+        // Helper function to parse km values
+        function parseKmValue(km) {
+            return parseFloat(km.replace('+', '.'));
+        }
+
         // State
         let checklistData = [];
         let isOnline = navigator.onLine;
         let selectedDirection = null;
         let startNicheId = null;
         let filteredNiches = [];
-        let trackFilter = 'entrambi'; // Track filter: 'pari', 'dispari', 'entrambi'
+        let trackFilter = TRACK_FILTER.BOTH; // Track filter: 'pari', 'dispari', 'entrambi'
  let pageSize = 10;
  let currentPageStart = 0;
  let orderedItemIds = [];
@@ -1580,9 +1592,7 @@
             
             // Sort items by km in ascending order
             const sortedItems = [...CHECKLIST_ITEMS].sort((a, b) => {
-                const aVal = parseFloat(a.km.replace('+', '.'));
-                const bVal = parseFloat(b.km.replace('+', '.'));
-                return aVal - bVal;
+                return parseKmValue(a.km) - parseKmValue(b.km);
             });
             
             sortedItems.forEach(item => {
@@ -1665,10 +1675,10 @@
                 const item = filteredNiches.find(n => n.id === id);
                 if (!item) return;
                 
-                if (trackFilter === 'pari') {
-                    el.style.display = item.binario === 'pari' ? 'block' : 'none';
-                } else if (trackFilter === 'dispari') {
-                    el.style.display = item.binario === 'dispari' ? 'block' : 'none';
+                if (trackFilter === TRACK_FILTER.PARI) {
+                    el.style.display = item.binario === TRACK_FILTER.PARI ? 'block' : 'none';
+                } else if (trackFilter === TRACK_FILTER.DISPARI) {
+                    el.style.display = item.binario === TRACK_FILTER.DISPARI ? 'block' : 'none';
                 } else {
                     el.style.display = 'block';
                 }
@@ -1680,36 +1690,30 @@
         // Filter niches by direction and track
         function filterNichesByDirection() {
             const startNiche = CHECKLIST_ITEMS.find(n => n.id === startNicheId);
-            const startKmValue = parseFloat(startNiche.km.replace('+', '.'));
+            const startKmValue = parseKmValue(startNiche.km);
             
             let baseFiltered;
             if (selectedDirection === 'san_benedetto') {
                 // Going up towards 55+742
                 baseFiltered = CHECKLIST_ITEMS.filter(n => {
-                    const kmValue = parseFloat(n.km.replace('+', '.'));
-                    return kmValue >= startKmValue;
+                    return parseKmValue(n.km) >= startKmValue;
                 }).sort((a, b) => {
-                    const aVal = parseFloat(a.km.replace('+', '.'));
-                    const bVal = parseFloat(b.km.replace('+', '.'));
-                    return aVal - bVal; // Ascending
+                    return parseKmValue(a.km) - parseKmValue(b.km); // Ascending
                 });
             } else {
                 // Going down towards 37+200
                 baseFiltered = CHECKLIST_ITEMS.filter(n => {
-                    const kmValue = parseFloat(n.km.replace('+', '.'));
-                    return kmValue <= startKmValue;
+                    return parseKmValue(n.km) <= startKmValue;
                 }).sort((a, b) => {
-                    const aVal = parseFloat(a.km.replace('+', '.'));
-                    const bVal = parseFloat(b.km.replace('+', '.'));
-                    return bVal - aVal; // Descending
+                    return parseKmValue(b.km) - parseKmValue(a.km); // Descending
                 });
             }
             
-            // Apply track filter
-            if (trackFilter === 'pari') {
-                filteredNiches = baseFiltered.filter(n => n.binario === 'pari');
-            } else if (trackFilter === 'dispari') {
-                filteredNiches = baseFiltered.filter(n => n.binario === 'dispari');
+            // Apply track filter using constants
+            if (trackFilter === TRACK_FILTER.PARI) {
+                filteredNiches = baseFiltered.filter(n => n.binario === TRACK_FILTER.PARI);
+            } else if (trackFilter === TRACK_FILTER.DISPARI) {
+                filteredNiches = baseFiltered.filter(n => n.binario === TRACK_FILTER.DISPARI);
             } else {
                 filteredNiches = baseFiltered;
             }
