@@ -1,35 +1,19 @@
-# RFI Tunnel Inspector - Sistema di Verifica Nicchie di Sicurezza
+# NicheSafe - Verifica Nicchie di Sicurezza Galleria Ferroviaria
 
-Progressive Web App professionale per la verifica delle nicchie di sicurezza nelle gallerie ferroviarie.
+Progressive Web App specializzata per la verifica delle nicchie di sicurezza nelle gallerie ferroviarie.
 
-## Caratteristiche Principali
+## 🚇 Caratteristiche
 
-- **740+ Nicchie Pre-caricate** (km 37+259 → 55+742)
-- **Selezione Direzione**: Scelta tra San Benedetto Val di Sambro (55+742) o Vernio (37+200)
-- **Verifiche Complete**:
-  - Segnaletica Uscite di Emergenza (tutte le nicchie)
-  - Illuminazione di Emergenza (12,5m tra corpi illuminanti) + conta luci non funzionanti
-  - Camminamento (verifica percorsi pedonali)
-  - Corrimano (verifica corrimano di sicurezza)
-  - Telefonia TEM (solo nicchie con impianto TEM)
-  - Idranti (solo nicchie con idranti)
-  - Quadri VVF (solo nicchie specifiche con manichette antincendio)
-- **Foto Condizionali**: Richieste solo per elementi non conformi
-- **Funzionamento Offline Completo**
-- **Report Dettagliato via Email**
+- 📋 **740 Nicchie Pre-caricate** (km 37+259 → 55+742)
+- 🎯 **Selezione Direzione**: Scegli se vai verso San Benedetto o Vernio
+- 🔍 **Verifiche Specifiche**:
+  - **Segnaletica Uscite di Emergenza**
+  - **Illuminazione di Emergenza** (12,5m tra corpi illuminanti)
+- 📷 **Foto Solo se Necessario**: Richiesta solo per "Necessita Manutenzione"
+- 💾 **Funzionamento Offline Completo**
+- 📧 **Report Dettagliato via Email**
 
-## Dati e Configurazione
-
-L'app carica dinamicamente i dati delle nicchie da file strutturati nella directory `/data`:
-
-- **NicchieTotali.txt**: Tutte le 740+ nicchie (colonne P e D per binari Pari e Dispari)
-- **NicchieQuadriVVF.txt**: Nicchie dotate di quadri VVF (solo colonna D)
-- **NicchieTEM.txt**: Nicchie con telefonia TEM (colonne D e P)
-- **NicchieIdranti.txt**: Nicchie con idranti (colonne D e P)
-
-I file vengono caricati all'avvio dell'app. Se il caricamento fallisce, viene utilizzato un dataset minimo embedded come fallback.
-
-## Specifiche Tecniche
+## 🎯 Specifiche Tecniche
 
 ### Segnaletica
 Segnaletica che indica le **uscite di emergenza** in galleria
@@ -37,7 +21,7 @@ Segnaletica che indica le **uscite di emergenza** in galleria
 ### Illuminazione
 Illuminazione di emergenza posta **sopra il corrimano** con distanza di **12,5 metri** tra un corpo illuminante e l'altro
 
-## Guida all'Utilizzo
+## 🚀 Come Usare
 
 ### 1. Avvio Verifica
 
@@ -48,44 +32,30 @@ All'apertura dell'app ti viene chiesto:
 - Esempio: "52+634 - Binario D"
 
 **b) In quale direzione stai andando?**
-- ↑ Verso San Benedetto Val di Sambro (55+742)
-- ↓ Verso Vernio (37+200)
+- ⬆️ Verso San Benedetto Val di Sambro (55+742)
+- ⬇️ Verso Vernio (37+200)
 
 L'app mostrerà **solo le nicchie nella direzione selezionata** dalla nicchia di partenza.
 
 ### 2. Verifica Ogni Nicchia
 
-Per ogni nicchia hai **più sezioni di verifica**:
+Per ogni nicchia hai **due sezioni**:
 
-#### Segnaletica Uscite di Emergenza
-- ✓ **Conforme** → Tutto OK
-- ⚠ **Non Conforme** → Appare pulsante foto
+#### 🚨 Segnaletica Uscite di Emergenza
+- ✅ **Funzionante** → Tutto OK
+- ⚠️ **Necessita Manutenzione** → Appare pulsante foto
 
-#### Illuminazione di Emergenza
-- ✓ **Conforme** → Tutto OK  
-- ⚠ **Non Conforme** → Appare:
-  - Campo numerico per contare i corpi illuminanti non funzionanti
-  - Pulsante "Allega Foto"
+Se selezioni "Necessita Manutenzione":
+- Appare il pulsante "📷 Scatta Foto Segnaletica"
+- Scatta foto per documentare il problema
 
-#### Camminamento
-- ✓ **Conforme** → Tutto OK
-- ⚠ **Non Conforme** → Appare pulsante foto
+#### 💡 Illuminazione di Emergenza
+- ✅ **Funzionante** → Tutto OK  
+- ⚠️ **Necessita Manutenzione** → Appare pulsante foto
 
-#### Corrimano
-- ✓ **Conforme** → Tutto OK
-- ⚠ **Non Conforme** → Appare pulsante foto
-
-#### Telefonia TEM (solo se presente)
-- ✓ **Conforme** → Tutto OK
-- ⚠ **Non Conforme** → Appare pulsante foto
-
-#### 🚰 Idranti (solo se presenti)
-- ✅ **Conforme** → Tutto OK
-- ⚠️ **Non Conforme** → Appare pulsante foto
-
-#### 🔥 Quadri VVF (solo nicchie specifiche)
-- ✅ **Presente e segnaletica OK** → Tutto OK
-- ⚠️ **Assente / non conforme** → Appare pulsante foto
+Se selezioni "Necessita Manutenzione":
+- Appare il pulsante "📷 Scatta Foto Illuminazione"
+- Scatta foto per documentare il problema
 
 ### 3. Workflow Completo
 

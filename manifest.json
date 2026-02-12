@@ -1,11 +1,11 @@
 {
-  "name": "RFI Tunnel Inspector - Sistema di Verifica Nicchie",
-  "short_name": "RFI Tunnel Inspector",
-  "description": "Sistema professionale per la verifica delle nicchie di sicurezza in gallerie ferroviarie",
+  "name": "NicheSafe - Verifica Nicchie Galleria",
+  "short_name": "NicheSafe",
+  "description": "Verifica nicchie di sicurezza in gallerie ferroviarie con fotocamera, GPS e report offline",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e40af",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -27,7 +27,7 @@
     {
       "name": "Nuova Verifica",
       "short_name": "Nuova",
-      "description": "Inizia una nuova sessione di verifica",
+      "description": "Inizia una nuova verifica nicchie",
       "url": "/",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
