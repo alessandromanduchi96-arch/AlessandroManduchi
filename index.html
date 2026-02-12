@@ -568,17 +568,17 @@
         <!-- Start Screen -->
         <div id="startScreen" class="card" style="display: block;">
             <header class="header">
-                <h1 class="logo">📍 NicheSafe</h1>
-                <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
+                <h1 class="logo">RFI Tunnel Inspector</h1>
+                <p class="tagline">Sistema di Verifica Nicchie di Sicurezza</p>
             </header>
             
             <h2 class="section-title" style="margin-top: 2rem;">
-                <span class="section-icon">🚀</span>
+                <span class="section-icon">></span>
                 Inizia Verifica
             </h2>
             
             <div style="margin-bottom: 2rem;">
-                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.9375rem;">
                     Da quale nicchia vuoi iniziare?
                 </label>
                 <select id="startNiche" class="email-input" style="cursor: pointer;">
@@ -587,7 +587,7 @@
             </div>
             
             <div style="margin-bottom: 2rem;">
-                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.9375rem;">
                     In quale direzione stai andando?
                 </label>
                 <select id="direction" class="email-input" style="cursor: pointer;">
@@ -889,8 +889,8 @@
                 
                 // Update direction info
                 const dirText = selectedDirection === 'san_benedetto' 
-                    ? '⬆️ Verso San Benedetto' 
-                    : '⬇️ Verso Vernio';
+                    ? '↑ Verso San Benedetto' 
+                    : '↓ Verso Vernio';
                 document.getElementById('directionInfo').textContent = dirText;
                 
                 // Show main screen
@@ -1599,7 +1599,7 @@ function updatePaginationUI() {
     } else {
       btn.style.display = 'inline-flex';
       const nextEnd = Math.min(end + pageSize, total);
-      btn.textContent = `➕ Mostra altre 10 (${end + 1}-${nextEnd})`;
+      btn.textContent = `+ Mostra altre 10 (${end + 1}-${nextEnd})`;
     }
   }
 }
