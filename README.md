@@ -29,7 +29,7 @@ All'apertura dell'app ti viene chiesto:
 
 **a) Da quale nicchia vuoi iniziare?**
 - Menu a tendina con tutte le 740 nicchie
-- Esempio: "52+634 - Binario D"
+- Esempio: "52+634 - Binario dispari"
 
 **b) In quale direzione stai andando?**
 - ⬆️ Verso San Benedetto Val di Sambro (55+742)
@@ -62,7 +62,7 @@ Se selezioni "Necessita Manutenzione":
 ```
 INIZIO
 ↓
-1. Seleziona nicchia partenza: "52+634 - Binario D"
+1. Seleziona nicchia partenza: "52+634 - Binario dispari"
 2. Seleziona direzione: "Verso San Benedetto"
 3. Premi "Inizia Verifica"
 ↓
@@ -99,11 +99,11 @@ Percentuale Completamento: 100%
 
 RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE
 
-📍 52+634 - Binario D
+📍 52+634 - Binario dispari
    ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione (2 foto)
    Verificato: 11/02/2025 14:30
 
-📍 48+424 - Binario P
+📍 48+424 - Binario pari
    ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione (1 foto)
    Verificato: 11/02/2025 15:15
 
@@ -111,7 +111,7 @@ RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE
 
 DETTAGLIO COMPLETO NICCHIE
 
-1. Km 52+634 - Binario D
+1. Km 52+634 - Binario dispari
    Stato: ✅ VERIFICATA
    Segnaletica Uscite Emergenza: ⚠️ Necessita Manutenzione
    Illuminazione Emergenza (12,5m): ✅ Funzionante
@@ -119,7 +119,7 @@ DETTAGLIO COMPLETO NICCHIE
    Foto Allegate: 2
      - Segnaletica: 2
 
-2. Km 52+621 - Binario D
+2. Km 52+621 - Binario dispari
    Stato: ✅ VERIFICATA
    Segnaletica Uscite Emergenza: ✅ Funzionante
    Illuminazione Emergenza (12,5m): ✅ Funzionante
