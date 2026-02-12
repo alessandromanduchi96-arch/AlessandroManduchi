@@ -546,6 +546,37 @@
             }
         }
         
+        /* Filter buttons */
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
         /* Responsive */
         @media (max-width: 640px) {
             .logo {
@@ -565,6 +596,15 @@
                 right: 1rem;
                 left: 1rem;
                 max-width: none;
+            }
+            
+            .filter-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                min-width: 100px;
             }
         }
         
@@ -608,6 +648,17 @@
                 </select>
             </div>
             
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                    Quali binari vuoi visualizzare?
+                </label>
+                <select id="trackFilter" class="email-input" style="cursor: pointer;">
+                    <option value="entrambi">🔄 Entrambi (Pari e Dispari)</option>
+                    <option value="pari">➡️ Solo Binari Pari</option>
+                    <option value="dispari">⬅️ Solo Binari Dispari</option>
+                </select>
+            </div>
+            
             <div style="text-align: center;">
                 <button class="btn btn-primary" id="startBtn" disabled>
                     <span>▶️</span>
@@ -639,6 +690,18 @@
                 <span class="section-icon">🚇</span>
                 Nicchie da Verificare
             </h2>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" id="filterEntrambi" data-filter="entrambi">
+                    🔄 Entrambi
+                </button>
+                <button class="filter-btn" id="filterPari" data-filter="pari">
+                    ➡️ Pari
+                </button>
+                <button class="filter-btn" id="filterDispari" data-filter="dispari">
+                    ⬅️ Dispari
+                </button>
+            </div>
             
             <div class="checklist" id="checklist">
                 <!-- Items will be added here -->
@@ -1492,6 +1555,7 @@
         let selectedDirection = null;
         let startNicheId = null;
         let filteredNiches = [];
+        let trackFilter = 'entrambi'; // Track filter: 'pari', 'dispari', 'entrambi'
  let pageSize = 10;
  let currentPageStart = 0;
  let orderedItemIds = [];
@@ -1514,7 +1578,14 @@
         function populateStartNicheSelect() {
             const select = document.getElementById('startNiche');
             
-            CHECKLIST_ITEMS.forEach(item => {
+            // Sort items by km in ascending order
+            const sortedItems = [...CHECKLIST_ITEMS].sort((a, b) => {
+                const aVal = parseFloat(a.km.replace('+', '.'));
+                const bVal = parseFloat(b.km.replace('+', '.'));
+                return aVal - bVal;
+            });
+            
+            sortedItems.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.id;
                 option.textContent = `${item.km} - Binario ${item.binario}`;
@@ -1526,6 +1597,7 @@
         function setupStartScreen() {
             const startNicheSelect = document.getElementById('startNiche');
             const directionSelect = document.getElementById('direction');
+            const trackFilterSelect = document.getElementById('trackFilter');
             const startBtn = document.getElementById('startBtn');
             
             const checkStartButton = () => {
@@ -1538,8 +1610,9 @@
             startBtn.addEventListener('click', () => {
                 startNicheId = parseInt(startNicheSelect.value);
                 selectedDirection = directionSelect.value;
+                trackFilter = trackFilterSelect.value;
                 
-                // Filter niches based on direction
+                // Filter niches based on direction and track
                 filterNichesByDirection();
                 
                 // Initialize filtered checklist
@@ -1557,18 +1630,62 @@
                 document.getElementById('startScreen').style.display = 'none';
                 document.getElementById('mainScreen').style.display = 'block';
                 
+                // Setup filter buttons
+                setupFilterButtons();
+                
                 showToast('Verifica iniziata!', 'success');
             });
         }
         
-        // Filter niches by direction
+        // Setup filter buttons in main screen
+        function setupFilterButtons() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newFilter = btn.dataset.filter;
+                    
+                    // Update active state
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Apply new filter
+                    trackFilter = newFilter;
+                    applyTrackFilter();
+                });
+            });
+        }
+        
+        // Apply track filter to already loaded items
+        function applyTrackFilter() {
+            orderedItemIds.forEach(id => {
+                const el = document.getElementById(`item-${id}`);
+                if (!el) return;
+                
+                const item = filteredNiches.find(n => n.id === id);
+                if (!item) return;
+                
+                if (trackFilter === 'pari') {
+                    el.style.display = item.binario === 'pari' ? 'block' : 'none';
+                } else if (trackFilter === 'dispari') {
+                    el.style.display = item.binario === 'dispari' ? 'block' : 'none';
+                } else {
+                    el.style.display = 'block';
+                }
+            });
+            
+            updatePaginationUI();
+        }
+        
+        // Filter niches by direction and track
         function filterNichesByDirection() {
             const startNiche = CHECKLIST_ITEMS.find(n => n.id === startNicheId);
             const startKmValue = parseFloat(startNiche.km.replace('+', '.'));
             
+            let baseFiltered;
             if (selectedDirection === 'san_benedetto') {
                 // Going up towards 55+742
-                filteredNiches = CHECKLIST_ITEMS.filter(n => {
+                baseFiltered = CHECKLIST_ITEMS.filter(n => {
                     const kmValue = parseFloat(n.km.replace('+', '.'));
                     return kmValue >= startKmValue;
                 }).sort((a, b) => {
@@ -1578,7 +1695,7 @@
                 });
             } else {
                 // Going down towards 37+200
-                filteredNiches = CHECKLIST_ITEMS.filter(n => {
+                baseFiltered = CHECKLIST_ITEMS.filter(n => {
                     const kmValue = parseFloat(n.km.replace('+', '.'));
                     return kmValue <= startKmValue;
                 }).sort((a, b) => {
@@ -1586,6 +1703,15 @@
                     const bVal = parseFloat(b.km.replace('+', '.'));
                     return bVal - aVal; // Descending
                 });
+            }
+            
+            // Apply track filter
+            if (trackFilter === 'pari') {
+                filteredNiches = baseFiltered.filter(n => n.binario === 'pari');
+            } else if (trackFilter === 'dispari') {
+                filteredNiches = baseFiltered.filter(n => n.binario === 'dispari');
+            } else {
+                filteredNiches = baseFiltered;
             }
         }
 
@@ -1635,7 +1761,7 @@
         // Create checklist item element
         function createChecklistItem(item, data) {
             const div = document.createElement('div');
-            div.className = 'check-item';
+            div.className = `check-item track-${item.binario}`;
             div.id = `item-${item.id}`;
             
             div.innerHTML = `
