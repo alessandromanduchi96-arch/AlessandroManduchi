@@ -592,10 +592,20 @@
             <div style="margin-bottom: 2rem;">
                 <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); font-size: 0.9375rem;">
                     Da quale nicchia vuoi iniziare?
+                    <small style="display: block; color: #6b7280; font-weight: 400; margin-top: 0.25rem; font-size: 0.8125rem;">
+                        Inserisci le prime due cifre (es. 55, 54, 53...)
+                    </small>
                 </label>
-                <select id="startNiche" class="email-input" style="cursor: pointer;">
-                    <option value="">-- Seleziona nicchia di partenza --</option>
-                </select>
+                <input 
+                    id="startNiche" 
+                    list="nicheList"
+                    class="email-input" 
+                    placeholder="es. 55+742 - D"
+                    autocomplete="off"
+                    style="cursor: text;"
+                >
+                <datalist id="nicheList">
+                </datalist>
             </div>
             
             <div style="margin-bottom: 2rem;">
@@ -840,7 +850,7 @@
                             id: index + 1,
                             km: parts[0],
                             binario: parts[1],
-                            title: `Nicchia km ${parts[0]} - Binario ${parts[1]}`,
+                            title: `Nicchia km ${parts[0]} - ${parts[1]}`,
                             description: `Verifica Segnaletica e Illuminazione`,
                             isVvfSpecial: VVF_SPECIAL_SET.has(nicheKey),
                             hasTEM: TEM_NICHES_SET.has(nicheKey),
@@ -879,9 +889,9 @@
  document.getElementById('loadMoreBtn')?.addEventListener('click', showNextPage);
         });
         
-        // Populate start niche dropdown with chunked loading for better performance
+        // Populate start niche datalist with chunked loading for better performance
         function populateStartNicheSelect() {
-            const select = document.getElementById('startNiche');
+            const datalist = document.getElementById('nicheList');
             const CHUNK_SIZE = 100; // Process 100 items at a time
             let currentIndex = 0;
             
@@ -889,17 +899,17 @@
                 const fragment = document.createDocumentFragment();
                 const endIndex = Math.min(currentIndex + CHUNK_SIZE, CHECKLIST_ITEMS.length);
                 
-                // Create options in batch
+                // Create options in batch - format: "55+742 - D"
                 for (let i = currentIndex; i < endIndex; i++) {
                     const item = CHECKLIST_ITEMS[i];
                     const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = `${item.km} - Binario ${item.binario}`;
+                    option.value = `${item.km} - ${item.binario}`;
+                    option.dataset.id = item.id;
                     fragment.appendChild(option);
                 }
                 
                 // Single DOM append for all options in this chunk
-                select.appendChild(fragment);
+                datalist.appendChild(fragment);
                 currentIndex = endIndex;
                 
                 // Schedule next chunk if there are more items
@@ -919,19 +929,35 @@
         
         // Setup start screen
         function setupStartScreen() {
-            const startNicheSelect = document.getElementById('startNiche');
+            const startNicheInput = document.getElementById('startNiche');
             const directionSelect = document.getElementById('direction');
             const startBtn = document.getElementById('startBtn');
             
             const checkStartButton = () => {
-                startBtn.disabled = !(startNicheSelect.value && directionSelect.value);
+                // Validate that input matches a valid niche format
+                const inputValue = startNicheInput.value.trim();
+                const isValidNiche = inputValue && CHECKLIST_ITEMS.some(item => 
+                    `${item.km} - ${item.binario}` === inputValue
+                );
+                startBtn.disabled = !(isValidNiche && directionSelect.value);
             };
             
-            startNicheSelect.addEventListener('change', checkStartButton);
+            startNicheInput.addEventListener('input', checkStartButton);
             directionSelect.addEventListener('change', checkStartButton);
             
             startBtn.addEventListener('click', () => {
-                startNicheId = parseInt(startNicheSelect.value);
+                // Parse the input value to find the corresponding niche ID
+                const inputValue = startNicheInput.value.trim();
+                const selectedItem = CHECKLIST_ITEMS.find(item => 
+                    `${item.km} - ${item.binario}` === inputValue
+                );
+                
+                if (!selectedItem) {
+                    alert('Seleziona una nicchia valida dalla lista');
+                    return;
+                }
+                
+                startNicheId = selectedItem.id;
                 selectedDirection = directionSelect.value;
                 
                 // Filter niches based on direction
@@ -1830,7 +1856,7 @@ function updatePaginationUI() {
                 
                 nichesNeedingMaintenance.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    report += `📍 ${niche.km} - Binario ${niche.binario}\n`;
+                    report += `📍 ${niche.km} - ${niche.binario}\n`;
                     
                     if (item.checks.segnaletica === 'non_conforme') {
                         const photoCount = item.photosByType?.segnaletica?.length || 0;
@@ -1893,7 +1919,7 @@ function updatePaginationUI() {
             
             checklistData.forEach((item, index) => {
                 const niche = filteredNiches.find(n => n.id === item.id);
-                report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario}\n`;
+                report += `${index + 1}. Km ${niche.km} - ${niche.binario}\n`;
                 report += `   Stato: ${item.completed ? '✅ VERIFICATA' : '⏳ DA VERIFICARE'}\n`;
                 
                 if (item.checks) {
