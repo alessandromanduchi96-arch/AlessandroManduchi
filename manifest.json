@@ -1,11 +1,11 @@
 {
-  "name": "NicheSafe - Verifica Nicchie Galleria",
-  "short_name": "NicheSafe",
-  "description": "Verifica nicchie di sicurezza in gallerie ferroviarie con fotocamera, GPS e report offline",
+  "name": "Monitoring impianti galleria",
+  "short_name": "Monitoring",
+  "description": "Verifica apprestamenti tecnologici in gallerie ferroviarie con report offline",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#FFF8F0",
+  "theme_color": "#FFF8F0",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -27,7 +27,7 @@
     {
       "name": "Nuova Verifica",
       "short_name": "Nuova",
-      "description": "Inizia una nuova verifica nicchie",
+      "description": "Inizia una nuova verifica apprestamenti",
       "url": "/",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
