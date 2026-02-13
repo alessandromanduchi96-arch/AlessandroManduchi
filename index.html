@@ -653,6 +653,23 @@
   </div>
  </div>
 
+            <!-- Malfunction Reporting Section -->
+            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border-radius: 1rem; border: 2px dashed var(--danger);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.1rem;">Segnalazione Malfunzionamenti</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Segnala problemi su camminamento, corrimano, segnaletica o illuminazione</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="openMalfunctionModal()" style="width: 100%; justify-content: center; background: var(--danger); color: white; border-color: var(--danger);">
+                    <span>🚨</span>
+                    <span>Segnala Malfunzionamento</span>
+                </button>
+                <div id="malfunctionCount" style="margin-top: 0.75rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                    Nessuna segnalazione registrata
+                </div>
+            </div>
             
             <div class="progress-section">
                 <div class="progress-header">
@@ -678,10 +695,103 @@
         </div> <!-- end mainScreen -->
     </div> <!-- end container -->
     
+    <!-- Malfunction Modal -->
+    <div id="malfunctionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; overflow-y: auto; padding: 1rem;">
+        <div style="max-width: 600px; margin: 2rem auto; background: var(--bg-card); border-radius: 1.5rem; padding: 2rem; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; margin: 0;">🚨 Segnala Malfunzionamento</h2>
+                <button onclick="closeMalfunctionModal()" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: background 0.3s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='none'">✕</button>
+            </div>
+            
+            <!-- Tipo di malfunzionamento -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Tipo di Malfunzionamento</label>
+                <div style="display: grid; gap: 0.75rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="camminamento" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">🚶 Camminamento</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="corrimano" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">🤝 Corrimano</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="segnaletica_uscita" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">🚪 Segnaletica di Uscita</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="illuminazione" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">💡 Impianto di Illuminazione</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Specifica tipo guasto + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Lighting specific fields (conditional) -->
+            <div id="lightingFields" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Tipo di Guasto Illuminazione</label>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="lightingType" value="fungo_blu" style="width: 20px; height: 20px; cursor: pointer;">
+                        <span>🔵 Fungo Blu</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="lightingType" value="corpi_illuminanti" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleLightingTypeChange()">
+                        <span>💡 Corpi Illuminanti</span>
+                    </label>
+                </div>
+                <div id="lightingBodyCount" style="display: none;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Numero di corpi non funzionanti</label>
+                    <input type="number" id="bodyCount" min="1" style="width: 100%; padding: 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem;">
+                </div>
+            </div>
+            
+            <!-- Progressiva chilometrica (always shown when type selected) -->
+            <div id="kmFields" style="display: none; margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">Progressiva Chilometrica *</label>
+                <input type="text" id="kmMarker" placeholder="es. 45+234" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem;">
+            </div>
+            
+            <!-- Photo capture (conditional - not for lighting) -->
+            <div id="photoFields" style="display: none; margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Foto del Malfunzionamento *</label>
+                <button onclick="captureMalfunctionPhoto()" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                    📷 Scatta Foto
+                </button>
+                <div id="malfunctionPhotoPreview" style="margin-top: 0.75rem;"></div>
+            </div>
+            
+            <!-- Note aggiuntive -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">Note Aggiuntive (opzionale)</label>
+                <textarea id="malfunctionNotes" rows="3" placeholder="Descrivi eventuali dettagli aggiuntivi..." style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem; resize: vertical; font-family: inherit;"></textarea>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; gap: 0.75rem;">
+                <button onclick="closeMalfunctionModal()" class="btn btn-secondary" style="flex: 1;">Annulla</button>
+                <button onclick="saveMalfunctionReport()" class="btn btn-primary" style="flex: 1;">Salva Segnalazione</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="toast" id="toast"></div>
     
     <!-- Hidden file input for camera -->
     <input type="file" accept="image/*" capture="environment" class="hidden" id="cameraInput">
+    <!-- Hidden file input for malfunction photos -->
+    <input type="file" accept="image/*" capture="environment" class="hidden" id="malfunctionCameraInput">
 
     <script>
         // Configuration - Railway Niches Data
@@ -1427,59 +1537,92 @@
 37+259 P`;
 
         // Parse niches data
- // Elenco nicchie con verifica aggiuntiva VV.F. (manichette + segnaletica)
- const VVF_SPECIAL_SET = new Set([
-  '55+575 D',
-  '55+425 D',
-  '55+275 D',
-  '55+175 D',
-  '55+024 D',
-  '54+874 D',
-  '54+774 D',
-  '54+674 D',
-  '54+574 D',
-  '54+424 D',
-  '54+324 D',
-  '54+174 D',
-  '54+024 D',
-  '53+773 D',
-  '53+623 D',
-  '53+473 D',
-  '53+373 D',
-  '53+223 D',
-  '53+073 D',
-  '47+724 P',
-  '47+649 P',
-  '47+524 P',
-  '47+273 P',
-  '47+173 P',
-  '47+025 P',
-  '46+697 P',
-  '46+597 P',
-  '46+447 P',
-  '46+208 P',
-  '46+058 P',
-  '45+908 P',
-  '45+758 P',
-  '45+658 P',
-  '45+508 P',
-  '45+408 P',
-  '45+308 P',
-  '45+158 P',
-  '45+058 P'
-]);
+ // Nicchie con apprestamenti tecnologici
+ // Solo queste nicchie devono essere verificate
+ const TECHNOLOGICAL_FACILITIES = {
+  // Idranti VVF (VVF Hydrants)
+  'idranti_vvf': new Set([
+   '55+575 D',
+   '55+425 D',
+   '55+275 D',
+   '55+175 D',
+   '55+024 D',
+   '54+874 D',
+   '54+774 D',
+   '54+674 D',
+   '54+574 D',
+   '54+424 D',
+   '54+324 D',
+   '54+174 D',
+   '54+024 D'
+  ]),
+  // Colonnine TEM (TEM Columns)
+  'colonnine_tem': new Set([
+   '53+773 D',
+   '53+623 D',
+   '53+473 D',
+   '53+373 D',
+   '53+223 D',
+   '53+073 D',
+   '47+724 P',
+   '47+649 P',
+   '47+524 P',
+   '47+273 P',
+   '47+173 P',
+   '47+025 P',
+   '46+697 P'
+  ]),
+  // Quadri di soccorso VVF (VVF Emergency Panels)
+  'quadri_soccorso_vvf': new Set([
+   '46+597 P',
+   '46+447 P',
+   '46+208 P',
+   '46+058 P',
+   '45+908 P',
+   '45+758 P',
+   '45+658 P',
+   '45+508 P',
+   '45+408 P',
+   '45+308 P',
+   '45+158 P',
+   '45+058 P'
+  ])
+ };
+
+ // Helper function to get facility type for a niche
+ function getFacilityType(km, binario) {
+  const key = `${km} ${binario}`;
+  if (TECHNOLOGICAL_FACILITIES.idranti_vvf.has(key)) return 'idranti_vvf';
+  if (TECHNOLOGICAL_FACILITIES.colonnine_tem.has(key)) return 'colonnine_tem';
+  if (TECHNOLOGICAL_FACILITIES.quadri_soccorso_vvf.has(key)) return 'quadri_soccorso_vvf';
+  return null;
+ }
+
+ // Helper function to get facility label
+ function getFacilityLabel(facilityType) {
+  const labels = {
+   'idranti_vvf': 'Idranti VVF',
+   'colonnine_tem': 'Colonnine TEM',
+   'quadri_soccorso_vvf': 'Quadri di soccorso VVF'
+  };
+  return labels[facilityType] || '';
+ }
 
         const CHECKLIST_ITEMS = NICHES_RAW_DATA.split('\n')
             .map((line, index) => {
                 const parts = line.trim().split(' ');
                 if (parts.length === 2) {
+                    const facilityType = getFacilityType(parts[0], parts[1]);
+                    // Solo nicchie con apprestamenti tecnologici
+                    if (!facilityType) return null;
+                    
                     return {
                         id: index + 1,
                         km: parts[0],
                         binario: parts[1],
                         title: `Nicchia km ${parts[0]} - Binario ${parts[1]}`,
-                        description: `Verifica Segnaletica e Illuminazione`,
-      isVvfSpecial: VVF_SPECIAL_SET.has(`${parts[0]} ${parts[1]}`)
+                        description: `${getFacilityLabel(facilityType)}`,
+                        facilityType: facilityType
                     };
                 }
                 return null;
@@ -1488,6 +1631,7 @@
 
         // State
         let checklistData = [];
+        let malfunctionReports = []; // Array per segnalazioni malfunzionamenti
         let isOnline = navigator.onLine;
         let selectedDirection = null;
         let startNicheId = null;
@@ -1602,22 +1746,14 @@
                     binario: item.binario,
                     title: item.title,
                     description: item.description,
+                    facilityType: item.facilityType,
                     completed: false,
                     checks: {
-                        segnaletica: null,
-                        illuminazione: null
+                        statoApprestamento: null, // Stato dell'apprestamento
+                        sigillo: null, // Verifica manomissione sigillo
+                        segnaletica: null // Presenza segnaletica di riferimento
                     },
                     timestamp: null,
-                    photos: [], // Backward compatibility
-                    photosByType: {
-                        segnaletica: [],
-                        illuminazione: [],
-                        general: []
-                    },
-                    needsPhoto: {
-                        segnaletica: false,
-                        illuminazione: false
-                    },
                     notes: ''
                 };
                 
@@ -1642,100 +1778,85 @@
                 <div class="check-header">
                     <div class="check-content">
                         <div class="check-title">${item.title}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            <span style="font-weight: 600; color: var(--warning);">📦 ${item.description}</span>
+                        </div>
                         
-                        <!-- Segnaletica Section -->
+                        <!-- Stato dell'apprestamento -->
                         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
                             <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🚨</span>
-                                <span>Segnaletica Uscite di Emergenza</span>
+                                <span>🔧</span>
+                                <span>Stato dell'apprestamento</span>
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                Verifica presenza e visibilità della segnaletica di emergenza che indica le uscite di sicurezza
+                                Verifica lo stato generale dell'apprestamento tecnologico
                             </div>
                             
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="funzionante" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="statoApprestamento-${item.id}" value="conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Funzionante</span>
+                                    <span style="font-weight: 500;">✅ Conforme</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="manutenzione" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="statoApprestamento-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Necessita Manutenzione</span>
+                                    <span style="font-weight: 500;">⚠️ Non Conforme</span>
                                 </label>
-                            </div>
-                            
-                            <div id="photo-btn-seg-${item.id}" style="margin-top: 1rem; display: none;">
-                                <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'segnaletica')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Segnaletica
-                                </button>
                             </div>
                         </div>
                         
-                        <!-- Illuminazione Section -->
+                        <!-- Verifica manomissione sigillo -->
                         <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
                             <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>💡</span>
-                                <span>Illuminazione di Emergenza</span>
+                                <span>🔒</span>
+                                <span>Verifica manomissione sigillo</span>
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                Verifica illuminazione sopra il corrimano (distanza 12,5m tra corpi illuminanti)
+                                Controlla se il sigillo è integro e non è stato manomesso
                             </div>
                             
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="illuminazione-${item.id}" value="funzionante" class="safety-radio" data-id="${item.id}" data-type="illuminazione"
+                                    <input type="radio" name="sigillo-${item.id}" value="integro" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Funzionante</span>
+                                    <span style="font-weight: 500;">✅ Integro</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="illuminazione-${item.id}" value="manutenzione" class="safety-radio" data-id="${item.id}" data-type="illuminazione"
+                                    <input type="radio" name="sigillo-${item.id}" value="manomesso" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Necessita Manutenzione</span>
+                                    <span style="font-weight: 500;">⚠️ Manomesso</span>
                                 </label>
-                            </div>
-                            
-                            <div id="photo-btn-ill-${item.id}" style="margin-top: 1rem; display: none;">
-                                <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'illuminazione')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Illuminazione
-                                </button>
                             </div>
                         </div>
                         
-                        ${item.isVvfSpecial ? `
- <!-- VVF Section (solo nicchie selezionate) -->
- <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-  <div style="display:flex; justify-content: space-between; align-items:center; gap: 0.75rem;">
-   <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-    <span>🔥</span>
-    <span>Antincendio VV.F. (Manichette + Segnaletica)</span>
-   </div>
-   <span class="vvf-badge">Check extra</span>
-  </div>
-  <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-   Verifica la presenza delle <b>manichette per i Vigili del Fuoco</b> e della <b>segnaletica di riferimento</b> (presente, visibile e conforme).
-  </div>
-  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-   <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-    <input type="radio" name="vvf-${item.id}" value="presente" class="safety-radio" data-id="${item.id}" data-type="vvf" style="width: 20px; height: 20px; cursor: pointer;">
-    <span style="font-weight: 500;">✅ Presente e segnaletica OK</span>
-   </label>
-   <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-    <input type="radio" name="vvf-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="vvf" style="width: 20px; height: 20px; cursor: pointer;">
-    <span style="font-weight: 500;">⚠️ Assente / non conforme</span>
-   </label>
-  </div>
-  <div id="photo-btn-vvf-${item.id}" style="margin-top: 1rem; display: none;">
-   <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'vvf')" style="width: 100%; justify-content: center;">📷 Scatta Foto VV.F.</button>
-  </div>
- </div>
-` : ``}
+                        <!-- Presenza segnaletica di riferimento -->
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span>🚨</span>
+                                <span>Presenza segnaletica di riferimento</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                Verifica la presenza della segnaletica di riferimento per l'apprestamento
+                            </div>
+                            
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="segnaletica-${item.id}" value="presente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">✅ Presente</span>
+                                </label>
+                                
+                                <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="segnaletica-${item.id}" value="assente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">⚠️ Assente</span>
+                                </label>
+                            </div>
+                        </div>
 
-<div class="photo-preview" id="photos-${item.id}" style="margin-top: 1rem;"></div>
-                        
                         <div class="check-meta" id="meta-${item.id}"></div>
                     </div>
                 </div>
@@ -1766,45 +1887,23 @@
             
             if (!itemData.checks) {
                 itemData.checks = {
-                    segnaletica: null,
-                    illuminazione: null
+                    statoApprestamento: null,
+                    sigillo: null,
+                    segnaletica: null
                 };
             }
             
             itemData.checks[type] = value;
             
-            // Show/hide photo button based on selection
-            const photoBtnId = type === 'segnaletica' ? `photo-btn-seg-${id}` : (type === 'illuminazione' ? `photo-btn-ill-${id}` : `photo-btn-vvf-${id}`);
- const photoBtn = document.getElementById(photoBtnId);
-            if (photoBtn) {
-                if (value === 'manutenzione' || value === 'non_conforme') {
-                    photoBtn.style.display = 'block';
-                } else {
-                    photoBtn.style.display = 'none';
-                }
-            }
-            
-            // Update completed status - both must be answered
-            const requiresVVF = filteredNiches.find(n => n.id === id)?.isVvfSpecial;
- itemData.completed = itemData.checks.segnaletica !== null && itemData.checks.illuminazione !== null && (!requiresVVF || itemData.checks.vvf !== null);
+            // Update completed status - all three checks must be answered
+            itemData.completed = itemData.checks.statoApprestamento !== null && 
+                                itemData.checks.sigillo !== null && 
+                                itemData.checks.segnaletica !== null;
             
             if (itemData.completed && !itemData.timestamp) {
                 itemData.timestamp = new Date().toISOString();
             } else if (!itemData.completed) {
                 itemData.timestamp = null;
-            }
-            
-            // Check if maintenance selected but no photo yet
-            if (value === 'manutenzione' || value === 'non_conforme') {
-                const photos = itemData.photosByType?.[type] || [];
-                if (photos.length === 0) {
-                    itemData.needsPhoto = itemData.needsPhoto || {};
-                    itemData.needsPhoto[type] = true;
-                }
-            } else {
-                if (itemData.needsPhoto) {
-                    itemData.needsPhoto[type] = false;
-                }
             }
             
             const itemEl = document.getElementById(`item-${id}`);
@@ -1924,6 +2023,173 @@
             win.document.write(`<img src="${photo}" style="max-width: 100%; height: auto;">`);
         }
 
+        // Malfunction reporting functions
+        let currentMalfunctionPhoto = null;
+        
+        function openMalfunctionModal() {
+            document.getElementById('malfunctionModal').style.display = 'block';
+            resetMalfunctionForm();
+        }
+        
+        function closeMalfunctionModal() {
+            document.getElementById('malfunctionModal').style.display = 'none';
+            resetMalfunctionForm();
+        }
+        
+        function resetMalfunctionForm() {
+            // Reset all form fields
+            document.querySelectorAll('input[name="malfunctionType"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[name="lightingType"]').forEach(r => r.checked = false);
+            document.getElementById('kmMarker').value = '';
+            document.getElementById('bodyCount').value = '';
+            document.getElementById('malfunctionNotes').value = '';
+            document.getElementById('kmFields').style.display = 'none';
+            document.getElementById('photoFields').style.display = 'none';
+            document.getElementById('lightingFields').style.display = 'none';
+            document.getElementById('lightingBodyCount').style.display = 'none';
+            document.getElementById('malfunctionPhotoPreview').innerHTML = '';
+            currentMalfunctionPhoto = null;
+            
+            // Reset label borders
+            document.querySelectorAll('.malfunction-type-label').forEach(l => l.style.borderColor = 'transparent');
+        }
+        
+        function handleMalfunctionTypeChange() {
+            const selectedType = document.querySelector('input[name="malfunctionType"]:checked')?.value;
+            
+            // Visual feedback
+            document.querySelectorAll('.malfunction-type-label').forEach(l => l.style.borderColor = 'transparent');
+            if (selectedType) {
+                const selectedLabel = document.querySelector(`input[name="malfunctionType"][value="${selectedType}"]`).closest('.malfunction-type-label');
+                selectedLabel.style.borderColor = 'var(--primary)';
+            }
+            
+            // Show/hide fields based on type
+            if (selectedType === 'illuminazione') {
+                document.getElementById('lightingFields').style.display = 'block';
+                document.getElementById('photoFields').style.display = 'none';
+            } else if (selectedType) {
+                document.getElementById('lightingFields').style.display = 'none';
+                document.getElementById('photoFields').style.display = 'block';
+            }
+            
+            // Always show km field when type selected
+            if (selectedType) {
+                document.getElementById('kmFields').style.display = 'block';
+            }
+        }
+        
+        function handleLightingTypeChange() {
+            const lightingType = document.querySelector('input[name="lightingType"]:checked')?.value;
+            const bodyCountDiv = document.getElementById('lightingBodyCount');
+            
+            if (lightingType === 'corpi_illuminanti') {
+                bodyCountDiv.style.display = 'block';
+            } else {
+                bodyCountDiv.style.display = 'none';
+            }
+        }
+        
+        function captureMalfunctionPhoto() {
+            const input = document.getElementById('malfunctionCameraInput');
+            input.click();
+        }
+        
+        // Handle malfunction photo capture
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('malfunctionCameraInput')?.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentMalfunctionPhoto = event.target.result;
+                    document.getElementById('malfunctionPhotoPreview').innerHTML = 
+                        `<img src="${event.target.result}" style="width: 100%; max-height: 200px; object-fit: contain; border-radius: 0.5rem; border: 1px solid var(--border);" alt="Preview">`;
+                    showToast('Foto acquisita!', 'success');
+                };
+                reader.readAsDataURL(file);
+                e.target.value = ''; // Reset input
+            });
+        });
+        
+        function saveMalfunctionReport() {
+            const type = document.querySelector('input[name="malfunctionType"]:checked')?.value;
+            const kmMarker = document.getElementById('kmMarker').value.trim();
+            const notes = document.getElementById('malfunctionNotes').value.trim();
+            
+            // Validation
+            if (!type) {
+                showToast('Seleziona il tipo di malfunzionamento', 'error');
+                return;
+            }
+            
+            if (!kmMarker) {
+                showToast('Inserisci la progressiva chilometrica', 'error');
+                return;
+            }
+            
+            // Type-specific validation
+            if (type === 'illuminazione') {
+                const lightingType = document.querySelector('input[name="lightingType"]:checked')?.value;
+                if (!lightingType) {
+                    showToast('Specifica il tipo di guasto illuminazione', 'error');
+                    return;
+                }
+                
+                if (lightingType === 'corpi_illuminanti') {
+                    const bodyCount = document.getElementById('bodyCount').value;
+                    if (!bodyCount || bodyCount < 1) {
+                        showToast('Inserisci il numero di corpi non funzionanti', 'error');
+                        return;
+                    }
+                }
+            } else {
+                // Photo required for non-lighting types
+                if (!currentMalfunctionPhoto) {
+                    showToast('Scatta una foto del malfunzionamento', 'error');
+                    return;
+                }
+            }
+            
+            // Create malfunction report
+            const report = {
+                id: Date.now(),
+                type: type,
+                kmMarker: kmMarker,
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (type === 'illuminazione') {
+                report.lightingType = document.querySelector('input[name="lightingType"]:checked').value;
+                if (report.lightingType === 'corpi_illuminanti') {
+                    report.bodyCount = document.getElementById('bodyCount').value;
+                }
+            } else {
+                report.photo = currentMalfunctionPhoto;
+            }
+            
+            malfunctionReports.push(report);
+            updateMalfunctionCount();
+            saveToLocalStorage();
+            closeMalfunctionModal();
+            showToast('Segnalazione salvata con successo!', 'success');
+        }
+        
+        function updateMalfunctionCount() {
+            const count = malfunctionReports.length;
+            const countEl = document.getElementById('malfunctionCount');
+            if (count === 0) {
+                countEl.textContent = 'Nessuna segnalazione registrata';
+                countEl.style.color = 'var(--text-secondary)';
+            } else {
+                countEl.textContent = `${count} segnalazione${count > 1 ? 'i' : ''} registrata${count > 1 ? 'e' : ''}`;
+                countEl.style.color = 'var(--danger)';
+                countEl.style.fontWeight = '600';
+            }
+        }
+
         // Update meta information
         function updateMeta(id) {
             const itemData = checklistData.find(item => item.id === id);
@@ -1942,45 +2208,35 @@
             }
             
             if (itemData.checks) {
-                if (itemData.checks.segnaletica) {
-                    const icon = itemData.checks.segnaletica === 'funzionante' ? '✅' : '⚠️';
+                if (itemData.checks.statoApprestamento) {
+                    const icon = itemData.checks.statoApprestamento === 'conforme' ? '✅' : '⚠️';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
-                            <span>Segnaletica: ${itemData.checks.segnaletica === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                            <span>Stato: ${itemData.checks.statoApprestamento === 'conforme' ? 'Conforme' : 'Non Conforme'}</span>
                         </div>
                     `;
                 }
                 
-                if (itemData.checks.vvf && (filteredNiches.find(n => n.id === id)?.isVvfSpecial)) {
-  const icon = itemData.checks.vvf === 'presente' ? '✅' : '⚠️';
-  metaHtml += `
-  <div class="meta-item">
-    <span class="meta-icon">${icon}</span>
-    <span>VV.F.: ${itemData.checks.vvf === 'presente' ? 'OK' : 'Non conforme'}</span>
-  </div>
-  `;
- }
- if (itemData.checks.illuminazione) {
-                    const icon = itemData.checks.illuminazione === 'funzionante' ? '✅' : '⚠️';
+                if (itemData.checks.sigillo) {
+                    const icon = itemData.checks.sigillo === 'integro' ? '✅' : '⚠️';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
-                            <span>Illuminazione: ${itemData.checks.illuminazione === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                            <span>Sigillo: ${itemData.checks.sigillo === 'integro' ? 'Integro' : 'Manomesso'}</span>
                         </div>
                     `;
                 }
-            }
-            
-            const photos = itemData.photosByType || {};
-            const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
-            if (totalPhotos > 0) {
-                metaHtml += `
-                    <div class="meta-item">
-                        <span class="meta-icon">📷</span>
-                        <span>${totalPhotos} foto</span>
-                    </div>
-                `;
+                
+                if (itemData.checks.segnaletica) {
+                    const icon = itemData.checks.segnaletica === 'presente' ? '✅' : '⚠️';
+                    metaHtml += `
+                        <div class="meta-item">
+                            <span class="meta-icon">${icon}</span>
+                            <span>Segnaletica: ${itemData.checks.segnaletica === 'presente' ? 'Presente' : 'Assente'}</span>
+                        </div>
+                    `;
+                }
             }
             
             container.innerHTML = metaHtml;
