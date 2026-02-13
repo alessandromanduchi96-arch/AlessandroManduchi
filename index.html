@@ -63,11 +63,40 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 1rem;
             position: relative;
             z-index: 1;
+        }
+        
+        /* Split screen layout */
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .split-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .split-panel {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .panel-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
         }
         
         /* Header */
@@ -607,6 +636,18 @@
                 </select>
             </div>
             
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                    Quali binari vuoi verificare?
+                </label>
+                <select id="trackFilter" class="email-input" style="cursor: pointer;">
+                    <option value="">-- Seleziona binari --</option>
+                    <option value="both">Entrambi (Pari e Dispari)</option>
+                    <option value="P">Solo Binario Pari</option>
+                    <option value="D">Solo Binario Dispari</option>
+                </select>
+            </div>
+            
             <div style="text-align: center;">
                 <button class="btn btn-primary" id="startBtn" disabled>
                     Inizia Verifica
@@ -629,14 +670,51 @@
             <div class="status-badge">
                 <span id="directionInfo">Direzione non impostata</span>
             </div>
+            <div class="status-badge">
+                <span id="trackFilterInfo">Binari: Tutti</span>
+            </div>
+            <button class="btn btn-secondary" id="changeFilterBtn" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                Cambia Filtro Binari
+            </button>
+        </div>
+        
+        <!-- Filter Change Modal -->
+        <div id="filterModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: var(--bg-card); padding: 2rem; border-radius: 1rem; max-width: 500px; width: 90%;">
+                <h3 style="margin-bottom: 1rem;">Cambia Filtro Binari</h3>
+                <select id="newTrackFilter" class="email-input" style="cursor: pointer; margin-bottom: 1rem;">
+                    <option value="both">Entrambi (Pari e Dispari)</option>
+                    <option value="P">Solo Binario Pari</option>
+                    <option value="D">Solo Binario Dispari</option>
+                </select>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" id="applyFilterBtn" style="flex: 1;">Applica</button>
+                    <button class="btn btn-secondary" id="cancelFilterBtn" style="flex: 1;">Annulla</button>
+                </div>
+            </div>
         </div>
         
         <div class="card">
             <h2 class="section-title">
-                Nicchie da Verificare
+                Verifica Nicchie - Vista Divisa
             </h2>
             
-            <div class="checklist" id="checklist">
+            <!-- Split Screen Container -->
+            <div class="split-container">
+                <!-- Left Panel: Odd Niches -->
+                <div class="split-panel">
+                    <div class="panel-title">Nicchie Dispari (a sinistra)</div>
+                    <div id="oddNiches"></div>
+                </div>
+                
+                <!-- Right Panel: Even Niches -->
+                <div class="split-panel">
+                    <div class="panel-title">Nicchie Pari (a destra)</div>
+                    <div id="evenNiches"></div>
+                </div>
+            </div>
+            
+            <div class="checklist" id="checklist" style="display: none;">
                 <!-- Items will be added here -->
             </div>
 
@@ -1487,14 +1565,23 @@
         let selectedDirection = null;
         let startNicheId = null;
         let filteredNiches = [];
+        let selectedTrackFilter = 'both'; // 'both', 'P', or 'D'
  let pageSize = 10;
  let currentPageStart = 0;
  let orderedItemIds = [];
+        
+        // Helper function to determine if niche is odd or even based on km
+        function isOddNiche(km) {
+            // Extract the number before the '+' (e.g., "55" from "55+742")
+            const mainKm = parseInt(km.split('+')[0]);
+            return mainKm % 2 !== 0;
+        }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             populateStartNicheSelect();
             setupStartScreen();
+            setupFilterModal();
             updateOnlineStatus();
             
             // Event listeners
@@ -1521,18 +1608,21 @@
         function setupStartScreen() {
             const startNicheSelect = document.getElementById('startNiche');
             const directionSelect = document.getElementById('direction');
+            const trackFilterSelect = document.getElementById('trackFilter');
             const startBtn = document.getElementById('startBtn');
             
             const checkStartButton = () => {
-                startBtn.disabled = !(startNicheSelect.value && directionSelect.value);
+                startBtn.disabled = !(startNicheSelect.value && directionSelect.value && trackFilterSelect.value);
             };
             
             startNicheSelect.addEventListener('change', checkStartButton);
             directionSelect.addEventListener('change', checkStartButton);
+            trackFilterSelect.addEventListener('change', checkStartButton);
             
             startBtn.addEventListener('click', () => {
                 startNicheId = parseInt(startNicheSelect.value);
                 selectedDirection = directionSelect.value;
+                selectedTrackFilter = trackFilterSelect.value;
                 
                 // Filter niches based on direction
                 filterNichesByDirection();
@@ -1542,17 +1632,51 @@
                 loadFromLocalStorage();
                 updateProgress();
                 
-                // Update direction info
+                // Update direction and track filter info
                 const dirText = selectedDirection === 'san_benedetto' 
-                    ? '⬆️ Verso San Benedetto' 
-                    : '⬇️ Verso Vernio';
+                    ? 'Verso San Benedetto' 
+                    : 'Verso Vernio';
                 document.getElementById('directionInfo').textContent = dirText;
+                
+                const trackText = selectedTrackFilter === 'both' ? 'Binari: Entrambi' :
+                                  selectedTrackFilter === 'P' ? 'Binari: Solo Pari' : 'Binari: Solo Dispari';
+                document.getElementById('trackFilterInfo').textContent = trackText;
                 
                 // Show main screen
                 document.getElementById('startScreen').style.display = 'none';
                 document.getElementById('mainScreen').style.display = 'block';
                 
                 showToast('Verifica iniziata!', 'success');
+            });
+        }
+        
+        // Setup filter modal for changing track filter during compilation
+        function setupFilterModal() {
+            const changeFilterBtn = document.getElementById('changeFilterBtn');
+            const modal = document.getElementById('filterModal');
+            const newTrackFilter = document.getElementById('newTrackFilter');
+            const applyBtn = document.getElementById('applyFilterBtn');
+            const cancelBtn = document.getElementById('cancelFilterBtn');
+            
+            changeFilterBtn.addEventListener('click', () => {
+                newTrackFilter.value = selectedTrackFilter;
+                modal.style.display = 'flex';
+            });
+            
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            applyBtn.addEventListener('click', () => {
+                selectedTrackFilter = newTrackFilter.value;
+                const trackText = selectedTrackFilter === 'both' ? 'Binari: Entrambi' :
+                                  selectedTrackFilter === 'P' ? 'Binari: Solo Pari' : 'Binari: Solo Dispari';
+                document.getElementById('trackFilterInfo').textContent = trackText;
+                modal.style.display = 'none';
+                
+                // Re-render with new filter
+                renderSplitScreen();
+                showToast('Filtro binari aggiornato', 'success');
             });
         }
         
@@ -1586,8 +1710,6 @@
 
         // Initialize checklist
         function initializeChecklist() {
-            const container = document.getElementById('checklist');
-            container.innerHTML = ''; // Clear existing
             checklistData = []; // Reset
             
             filteredNiches.forEach(item => {
@@ -1599,33 +1721,177 @@
                     description: item.description,
                     completed: false,
                     checks: {
-                        segnaletica: null,
-                        illuminazione: null
+                        illuminazione: null,
+                        corrimano: null,
+                        camminamento: null
                     },
                     timestamp: null,
-                    photos: [], // Backward compatibility
+                    photos: [],
                     photosByType: {
-                        segnaletica: [],
                         illuminazione: [],
+                        corrimano: [],
+                        camminamento: [],
                         general: []
                     },
                     needsPhoto: {
-                        segnaletica: false,
-                        illuminazione: false
+                        illuminazione: false,
+                        corrimano: false,
+                        camminamento: false
                     },
                     notes: ''
                 };
                 
                 checklistData.push(itemData);
-                
-                const itemEl = createChecklistItem(item, itemData);
-                container.appendChild(itemEl);
             });
+            
+            // Render split screen
+            renderSplitScreen();
+        }
         
-            // Pagination order and first page
-            orderedItemIds = filteredNiches.map(n => n.id);
-            showPage(0);
-}
+        // Render split screen with odd/even niches
+        function renderSplitScreen() {
+            const oddContainer = document.getElementById('oddNiches');
+            const evenContainer = document.getElementById('evenNiches');
+            oddContainer.innerHTML = '';
+            evenContainer.innerHTML = '';
+            
+            // Filter niches based on track filter and odd/even
+            filteredNiches.forEach(niche => {
+                // Apply track filter
+                if (selectedTrackFilter !== 'both' && niche.binario !== selectedTrackFilter) {
+                    return; // Skip this niche
+                }
+                
+                const itemData = checklistData.find(d => d.id === niche.id);
+                if (!itemData) return;
+                
+                // Determine if odd or even and create appropriate item
+                if (isOddNiche(niche.km)) {
+                    // Odd niche - goes to left panel
+                    // Fields: Illuminazione, Corrimano, Camminamento internicchiale PARI
+                    const itemEl = createNicheItem(niche, itemData, 'pari');
+                    oddContainer.appendChild(itemEl);
+                } else {
+                    // Even niche - goes to right panel
+                    // Fields: Illuminazione, Corrimano, Camminamento internicchiale DISPARI
+                    const itemEl = createNicheItem(niche, itemData, 'dispari');
+                    evenContainer.appendChild(itemEl);
+                }
+            });
+        }
+        
+        // Create niche item for split screen
+        function createNicheItem(niche, data, camminamentoType) {
+            const div = document.createElement('div');
+            div.className = 'check-item';
+            div.id = `item-${niche.id}`;
+            div.style.marginBottom = '1.5rem';
+            
+            const camminamentoLabel = camminamentoType === 'pari' ? 
+                'Camminamento Internicchiale Pari' : 
+                'Camminamento Internicchiale Dispari';
+            
+            div.innerHTML = `
+                <div class="check-header">
+                    <div class="check-content">
+                        <div class="check-title" style="font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem;">${niche.title}</div>
+                        
+                        <!-- Illuminazione Section -->
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Illuminazione
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="illuminazione-${niche.id}" value="funzionante" class="safety-radio" data-id="${niche.id}" data-type="illuminazione"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">✅ OK</span>
+                                </label>
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="illuminazione-${niche.id}" value="manutenzione" class="safety-radio" data-id="${niche.id}" data-type="illuminazione"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">⚠️ Manutenzione</span>
+                                </label>
+                            </div>
+                            <div id="photo-btn-illuminazione-${niche.id}" style="margin-top: 0.5rem; display: none;">
+                                <button class="btn btn-secondary" onclick="capturePhoto(${niche.id}, 'illuminazione')" style="width: 100%; justify-content: center; font-size: 0.875rem; padding: 0.5rem;">
+                                    Scatta Foto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Corrimano Section -->
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Corrimano
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="corrimano-${niche.id}" value="funzionante" class="safety-radio" data-id="${niche.id}" data-type="corrimano"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">✅ OK</span>
+                                </label>
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="corrimano-${niche.id}" value="manutenzione" class="safety-radio" data-id="${niche.id}" data-type="corrimano"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">⚠️ Manutenzione</span>
+                                </label>
+                            </div>
+                            <div id="photo-btn-corrimano-${niche.id}" style="margin-top: 0.5rem; display: none;">
+                                <button class="btn btn-secondary" onclick="capturePhoto(${niche.id}, 'corrimano')" style="width: 100%; justify-content: center; font-size: 0.875rem; padding: 0.5rem;">
+                                    Scatta Foto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Camminamento Section -->
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                ${camminamentoLabel}
+                            </div>
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="camminamento-${niche.id}" value="funzionante" class="safety-radio" data-id="${niche.id}" data-type="camminamento"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">✅ OK</span>
+                                </label>
+                                <label style="flex: 1; min-width: 120px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="camminamento-${niche.id}" value="manutenzione" class="safety-radio" data-id="${niche.id}" data-type="camminamento"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">⚠️ Manutenzione</span>
+                                </label>
+                            </div>
+                            <div id="photo-btn-camminamento-${niche.id}" style="margin-top: 0.5rem; display: none;">
+                                <button class="btn btn-secondary" onclick="capturePhoto(${niche.id}, 'camminamento')" style="width: 100%; justify-content: center; font-size: 0.875rem; padding: 0.5rem;">
+                                    Scatta Foto
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="photo-preview" id="photos-${niche.id}" style="margin-top: 1rem;"></div>
+                        <div class="check-meta" id="meta-${niche.id}"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Add radio listeners
+            const radios = div.querySelectorAll('.safety-radio');
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    handleSafetyCheck(niche.id, e.target.dataset.type, e.target.value);
+                    
+                    // Visual feedback for selected label
+                    const label = e.target.closest('.radio-label');
+                    const allLabels = label.parentElement.querySelectorAll('.radio-label');
+                    allLabels.forEach(l => l.style.borderColor = 'transparent');
+                    if (e.target.checked) {
+                        label.style.borderColor = 'var(--primary)';
+                    }
+                });
+            });
+            
+            return div;
+        }
 
         // Create checklist item element
         function createChecklistItem(item, data) {
@@ -1758,15 +2024,16 @@
             
             if (!itemData.checks) {
                 itemData.checks = {
-                    segnaletica: null,
-                    illuminazione: null
+                    illuminazione: null,
+                    corrimano: null,
+                    camminamento: null
                 };
             }
             
             itemData.checks[type] = value;
             
             // Show/hide photo button based on selection
-            const photoBtnId = type === 'segnaletica' ? `photo-btn-seg-${id}` : (type === 'illuminazione' ? `photo-btn-ill-${id}` : `photo-btn-vvf-${id}`);
+            const photoBtnId = `photo-btn-${type}-${id}`;
  const photoBtn = document.getElementById(photoBtnId);
             if (photoBtn) {
                 if (value === 'manutenzione' || value === 'non_conforme') {
@@ -1776,9 +2043,10 @@
                 }
             }
             
-            // Update completed status - both must be answered
-            const requiresVVF = filteredNiches.find(n => n.id === id)?.isVvfSpecial;
- itemData.completed = itemData.checks.segnaletica !== null && itemData.checks.illuminazione !== null && (!requiresVVF || itemData.checks.vvf !== null);
+            // Update completed status - all three must be answered
+ itemData.completed = itemData.checks.illuminazione !== null && 
+                             itemData.checks.corrimano !== null && 
+                             itemData.checks.camminamento !== null;
             
             if (itemData.completed && !itemData.timestamp) {
                 itemData.timestamp = new Date().toISOString();
@@ -1875,27 +2143,27 @@
             
             let html = '';
             
-            // Segnaletica photos
-            if (itemData.photosByType.segnaletica?.length > 0) {
-                html += '<div style="margin-bottom: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Segnaletica Mancante:</div>';
-                itemData.photosByType.segnaletica.forEach((photo, index) => {
-                    html += `<img src="${photo.data}" class="photo-thumbnail" alt="Segnaletica ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
-                });
-            }
-            
             // Illuminazione photos
             if (itemData.photosByType.illuminazione?.length > 0) {
-                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Illuminazione Mancante:</div>';
+                html += '<div style="margin-bottom: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Illuminazione:</div>';
                 itemData.photosByType.illuminazione.forEach((photo, index) => {
                     html += `<img src="${photo.data}" class="photo-thumbnail" alt="Illuminazione ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
                 });
             }
             
-            // VVF photos
- if (itemData.photosByType.vvf?.length > 0) {
-  html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">VV.F. / Manichette:</div>';
-  itemData.photosByType.vvf.forEach((photo, index) => {
-    html += `<img src="${photo.data}" class="photo-thumbnail" alt="VVF ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
+            // Corrimano photos
+            if (itemData.photosByType.corrimano?.length > 0) {
+                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Corrimano:</div>';
+                itemData.photosByType.corrimano.forEach((photo, index) => {
+                    html += `<img src="${photo.data}" class="photo-thumbnail" alt="Corrimano ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
+                });
+            }
+            
+            // Camminamento photos
+ if (itemData.photosByType.camminamento?.length > 0) {
+  html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Camminamento:</div>';
+  itemData.photosByType.camminamento.forEach((photo, index) => {
+    html += `<img src="${photo.data}" class="photo-thumbnail" alt="Camminamento ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
   });
  }
 
@@ -1933,26 +2201,7 @@
             }
             
             if (itemData.checks) {
-                if (itemData.checks.segnaletica) {
-                    const icon = itemData.checks.segnaletica === 'funzionante' ? '✅' : '⚠️';
-                    metaHtml += `
-                        <div class="meta-item">
-                            <span class="meta-icon">${icon}</span>
-                            <span>Segnaletica: ${itemData.checks.segnaletica === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
-                        </div>
-                    `;
-                }
-                
-                if (itemData.checks.vvf && (filteredNiches.find(n => n.id === id)?.isVvfSpecial)) {
-  const icon = itemData.checks.vvf === 'presente' ? '✅' : '⚠️';
-  metaHtml += `
-  <div class="meta-item">
-    <span class="meta-icon">${icon}</span>
-    <span>VV.F.: ${itemData.checks.vvf === 'presente' ? 'OK' : 'Non conforme'}</span>
-  </div>
-  `;
- }
- if (itemData.checks.illuminazione) {
+                if (itemData.checks.illuminazione) {
                     const icon = itemData.checks.illuminazione === 'funzionante' ? '✅' : '⚠️';
                     metaHtml += `
                         <div class="meta-item">
@@ -1961,10 +2210,30 @@
                         </div>
                     `;
                 }
+                
+                if (itemData.checks.corrimano) {
+                    const icon = itemData.checks.corrimano === 'funzionante' ? '✅' : '⚠️';
+                    metaHtml += `
+                        <div class="meta-item">
+                            <span class="meta-icon">${icon}</span>
+                            <span>Corrimano: ${itemData.checks.corrimano === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                        </div>
+                    `;
+                }
+                
+ if (itemData.checks.camminamento) {
+                    const icon = itemData.checks.camminamento === 'funzionante' ? '✅' : '⚠️';
+                    metaHtml += `
+                        <div class="meta-item">
+                            <span class="meta-icon">${icon}</span>
+                            <span>Camminamento: ${itemData.checks.camminamento === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                        </div>
+                    `;
+                }
             }
             
             const photos = itemData.photosByType || {};
-            const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
+            const totalPhotos = (photos.illuminazione?.length || 0) + (photos.corrimano?.length || 0) + (photos.camminamento?.length || 0);
             if (totalPhotos > 0) {
                 metaHtml += `
                     <div class="meta-item">
