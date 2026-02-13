@@ -2,18 +2,18 @@
 
 Progressive Web App specializzata per la verifica delle nicchie di sicurezza nelle gallerie ferroviarie.
 
-## 🚇 Caratteristiche
+## Caratteristiche
 
-- 📋 **740 Nicchie Pre-caricate** (km 37+259 → 55+742)
-- 🎯 **Selezione Direzione**: Scegli se vai verso San Benedetto o Vernio
-- 🔍 **Verifiche Specifiche**:
+- **740 Nicchie Pre-caricate** (km 37+259 → 55+742)
+- **Selezione Direzione**: Scegli se vai verso San Benedetto o Vernio
+- **Verifiche Specifiche**:
   - **Segnaletica Uscite di Emergenza**
   - **Illuminazione di Emergenza** (12,5m tra corpi illuminanti)
-- 📷 **Foto Solo se Necessario**: Richiesta solo per "Necessita Manutenzione"
-- 💾 **Funzionamento Offline Completo**
-- 📧 **Report Dettagliato via Email**
+- **Foto Solo se Necessario**: Richiesta solo per "Necessita Manutenzione"
+- **Funzionamento Offline Completo**
+- **Report Dettagliato via Email**
 
-## 🎯 Specifiche Tecniche
+## Specifiche Tecniche
 
 ### Segnaletica
 Segnaletica che indica le **uscite di emergenza** in galleria
@@ -21,7 +21,7 @@ Segnaletica che indica le **uscite di emergenza** in galleria
 ### Illuminazione
 Illuminazione di emergenza posta **sopra il corrimano** con distanza di **12,5 metri** tra un corpo illuminante e l'altro
 
-## 🚀 Come Usare
+## Come Usare
 
 ### 1. Avvio Verifica
 
@@ -32,8 +32,8 @@ All'apertura dell'app ti viene chiesto:
 - Esempio: "52+634 - Binario D"
 
 **b) In quale direzione stai andando?**
-- ⬆️ Verso San Benedetto Val di Sambro (55+742)
-- ⬇️ Verso Vernio (37+200)
+- Verso San Benedetto Val di Sambro (55+742)
+- Verso Vernio (37+200)
 
 L'app mostrerà **solo le nicchie nella direzione selezionata** dalla nicchia di partenza.
 
@@ -41,20 +41,20 @@ L'app mostrerà **solo le nicchie nella direzione selezionata** dalla nicchia di
 
 Per ogni nicchia hai **due sezioni**:
 
-#### 🚨 Segnaletica Uscite di Emergenza
+#### Segnaletica Uscite di Emergenza
 - ✅ **Funzionante** → Tutto OK
 - ⚠️ **Necessita Manutenzione** → Appare pulsante foto
 
 Se selezioni "Necessita Manutenzione":
-- Appare il pulsante "📷 Scatta Foto Segnaletica"
+- Appare il pulsante "Scatta Foto Segnaletica"
 - Scatta foto per documentare il problema
 
-#### 💡 Illuminazione di Emergenza
+#### Illuminazione di Emergenza
 - ✅ **Funzionante** → Tutto OK  
 - ⚠️ **Necessita Manutenzione** → Appare pulsante foto
 
 Se selezioni "Necessita Manutenzione":
-- Appare il pulsante "📷 Scatta Foto Illuminazione"
+- Appare il pulsante "Scatta Foto Illuminazione"
 - Scatta foto per documentare il problema
 
 ### 3. Workflow Completo
@@ -85,7 +85,7 @@ FINE
 8. Invia Report
 ```
 
-## 📊 Esempio Report
+## Esempio Report
 
 ```
 REPORT VERIFICA NICCHIE DI SICUREZZA GALLERIA
@@ -99,11 +99,11 @@ Percentuale Completamento: 100%
 
 RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE
 
-📍 52+634 - Binario D
+Km 52+634 - Binario D
    ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione (2 foto)
    Verificato: 11/02/2025 14:30
 
-📍 48+424 - Binario P
+Km 48+424 - Binario P
    ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione (1 foto)
    Verificato: 11/02/2025 15:15
 
@@ -132,7 +132,7 @@ Note Tecniche:
 - Illuminazione: Corpi illuminanti sopra corrimano a distanza 12,5m
 ```
 
-## ✨ Caratteristiche Avanzate
+## Caratteristiche Avanzate
 
 ### Filtro Automatico
 L'app mostra solo le nicchie rilevanti:
@@ -154,7 +154,7 @@ L'app mostra solo le nicchie rilevanti:
 - Più veloce
 - Funziona anche senza permessi GPS
 
-## 🛠️ Setup
+## Setup
 
 ### Test Locale
 ```bash
@@ -166,25 +166,25 @@ python3 -m http.server 8000
 1. Carica su server HTTPS
 2. Installa come PWA dal browser
 
-## 📱 Installazione Mobile
+## Installazione Mobile
 
 1. Apri nel browser (Chrome/Safari)
 2. Menu → "Aggiungi a schermata Home"
-3. App installata ✓
+3. App installata
 
-## 🔒 Permessi
+## Permessi
 - **Fotocamera**: Solo per documentare manutenzioni
 - **Storage**: Per salvare dati offline
 - **NO GPS richiesto**
 
-## 💡 Vantaggi
+## Vantaggi
 
 ### Rispetto alla Versione Precedente
-- ✅ Selezione direzione (evita nicchie inutili)
-- ✅ Foto solo quando serve (più veloce)
-- ✅ Nessun GPS (più semplice)
-- ✅ Descrizioni dettagliate (chiare)
-- ✅ Due risposte (Funzionante/Manutenzione)
+- Selezione direzione (evita nicchie inutili)
+- Foto solo quando serve (più veloce)
+- Nessun GPS (più semplice)
+- Descrizioni dettagliate (chiare)
+- Due risposte (Funzionante/Manutenzione)
 
 ### Efficienza
 - Verifichi solo le nicchie rilevanti
@@ -192,7 +192,7 @@ python3 -m http.server 8000
 - Foto solo se necessario
 - Report focalizzato su problemi
 
-## 🎯 Casi d'Uso
+## Casi d'Uso
 
 **Scenario 1: Ispezione Completa**
 - Parti da inizio galleria (37+259)
@@ -209,7 +209,7 @@ python3 -m http.server 8000
 - Direzione: San Benedetto
 - Solo nicchie problematiche fotografate
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Foto non si scattano?**
 - Verifica permessi fotocamera
@@ -225,4 +225,4 @@ python3 -m http.server 8000
 
 ---
 
-**NicheSafe** - Verifica efficiente e sicura 🚇
+**NicheSafe** - Verifica efficiente e sicura
