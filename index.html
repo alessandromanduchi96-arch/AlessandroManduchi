@@ -701,15 +701,15 @@
             
             <!-- Split Screen Container -->
             <div class="split-container">
-                <!-- Left Panel: Odd Niches -->
+                <!-- Left Panel: Binario D (Dispari) -->
                 <div class="split-panel">
-                    <div class="panel-title">Nicchie Dispari (a sinistra)</div>
+                    <div class="panel-title">Binario D - Nicchie Dispari</div>
                     <div id="oddNiches"></div>
                 </div>
                 
-                <!-- Right Panel: Even Niches -->
+                <!-- Right Panel: Binario P (Pari) -->
                 <div class="split-panel">
-                    <div class="panel-title">Nicchie Pari (a destra)</div>
+                    <div class="panel-title">Binario P - Nicchie Pari</div>
                     <div id="evenNiches"></div>
                 </div>
             </div>
@@ -1570,11 +1570,10 @@
  let currentPageStart = 0;
  let orderedItemIds = [];
         
-        // Helper function to determine if niche is odd or even based on km
-        function isOddNiche(km) {
-            // Extract the number before the '+' (e.g., "55" from "55+742")
-            const mainKm = parseInt(km.split('+')[0]);
-            return mainKm % 2 !== 0;
+        // Helper function to determine if niche is odd or even based on binario
+        function isOddNiche(niche) {
+            // Binario D = Dispari (odd), Binario P = Pari (even)
+            return niche.binario === 'D';
         }
         
         // Initialize
@@ -1765,14 +1764,14 @@
                 const itemData = checklistData.find(d => d.id === niche.id);
                 if (!itemData) return;
                 
-                // Determine if odd or even and create appropriate item
-                if (isOddNiche(niche.km)) {
-                    // Odd niche - goes to left panel
+                // Determine if odd or even based on binario (D = Dispari, P = Pari)
+                if (isOddNiche(niche)) {
+                    // Binario D (Dispari) - goes to left panel
                     // Fields: Illuminazione, Corrimano, Camminamento internicchiale PARI
                     const itemEl = createNicheItem(niche, itemData, 'pari');
                     oddContainer.appendChild(itemEl);
                 } else {
-                    // Even niche - goes to right panel
+                    // Binario P (Pari) - goes to right panel
                     // Fields: Illuminazione, Corrimano, Camminamento internicchiale DISPARI
                     const itemEl = createNicheItem(niche, itemData, 'dispari');
                     evenContainer.appendChild(itemEl);
@@ -2395,10 +2394,10 @@ function updatePaginationUI() {
                 
                 nichesNeedingMaintenance.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    const isOdd = isOddNiche(niche.km);
+                    const isOdd = isOddNiche(niche);
                     const camminamentoType = isOdd ? 'Pari' : 'Dispari';
                     
-                    report += `Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Nicchia Dispari' : 'Nicchia Pari'})\n`;
+                    report += `Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Binario D (Dispari)' : 'Binario P (Pari)'})\n`;
                     
                     if (item.checks.illuminazione === 'manutenzione') {
                         const photoCount = item.photosByType?.illuminazione?.length || 0;
@@ -2435,10 +2434,10 @@ function updatePaginationUI() {
             
             checklistData.forEach((item, index) => {
                 const niche = filteredNiches.find(n => n.id === item.id);
-                const isOdd = isOddNiche(niche.km);
+                const isOdd = isOddNiche(niche);
                 const camminamentoType = isOdd ? 'Pari' : 'Dispari';
                 
-                report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Nicchia Dispari' : 'Nicchia Pari'})\n`;
+                report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Binario D (Dispari)' : 'Binario P (Pari)'})\n`;
                 report += `   Stato: ${item.completed ? '✅ VERIFICATA' : '⏳ DA VERIFICARE'}\n`;
                 
                 if (item.checks) {
