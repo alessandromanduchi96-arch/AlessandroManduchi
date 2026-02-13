@@ -619,8 +619,8 @@
         <!-- Main Screen -->
         <div id="mainScreen" style="display: none;">
         <header class="header">
-            <h1 class="logo">📍 NicheSafe</h1>
-            <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
+            <h1 class="logo">NicheSafe</h1>
+            <p class="tagline">Verifica Apprestamenti Tecnologici Galleria Ferroviaria</p>
         </header>
         
         <div class="status-bar">
@@ -629,15 +629,14 @@
                 <span id="statusText">Controllo connessione...</span>
             </div>
             <div class="status-badge">
-                <span>📋</span>
                 <span id="directionInfo">Direzione non impostata</span>
             </div>
         </div>
         
         <div class="card">
             <h2 class="section-title">
-                <span class="section-icon">🚇</span>
-                Nicchie da Verificare
+                <span class="section-icon">📋</span>
+                Apprestamenti da Verificare
             </h2>
             
             <div class="checklist" id="checklist">
@@ -646,30 +645,13 @@
 
  <div id="paginationControls" style="margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
   <button class="btn btn-secondary" id="loadMoreBtn" type="button" style="min-width: 220px; justify-content: center;">
-    ➕ Mostra altre 10
+    Mostra altre 10
   </button>
   <div id="shownCount" style="color: var(--text-secondary); font-size: 0.9rem;">
     Mostrate 0/0
   </div>
  </div>
 
-            <!-- Malfunction Reporting Section -->
-            <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(239, 68, 68, 0.1); border-radius: 1rem; border: 2px dashed var(--danger);">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                    <span style="font-size: 1.5rem;">⚠️</span>
-                    <div>
-                        <div style="font-weight: 700; font-size: 1.1rem;">Segnalazione Malfunzionamenti</div>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">Segnala problemi su camminamento, corrimano, segnaletica o illuminazione</div>
-                    </div>
-                </div>
-                <button class="btn btn-secondary" onclick="openMalfunctionModal()" style="width: 100%; justify-content: center; background: var(--danger); color: white; border-color: var(--danger);">
-                    <span>🚨</span>
-                    <span>Segnala Malfunzionamento</span>
-                </button>
-                <div id="malfunctionCount" style="margin-top: 0.75rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
-                    Nessuna segnalazione registrata
-                </div>
-            </div>
             
             <div class="progress-section">
                 <div class="progress-header">
@@ -687,7 +669,6 @@
   </div>
   <input type="email" class="email-input hidden" id="emailInput" value="a.manduchi@rfi.it">
   <button class="btn btn-primary" id="submitBtn">
-                    <span>📧</span>
                     <span>Invia Report via Email</span>
                 </button>
 </div>
@@ -695,11 +676,22 @@
         </div> <!-- end mainScreen -->
     </div> <!-- end container -->
     
+    <!-- Fixed Floating Malfunction Button -->
+    <button id="floatingMalfunctionBtn" onclick="openMalfunctionModal()" 
+            onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 16px rgba(0, 0, 0, 0.4)'; document.getElementById('btnTooltip').style.opacity='1'" 
+            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)'; document.getElementById('btnTooltip').style.opacity='0'"
+            style="display: none; position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--danger); color: white; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); cursor: pointer; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s; font-weight: bold;">
+        !
+        <div style="position: absolute; bottom: 70px; right: 0; background: var(--bg-card); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 0.5rem; white-space: nowrap; font-size: 0.875rem; font-weight: normal; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); opacity: 0; pointer-events: none; transition: opacity 0.3s;" id="btnTooltip">
+            Segnala Malfunzionamento
+        </div>
+    </button>
+    
     <!-- Malfunction Modal -->
     <div id="malfunctionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; overflow-y: auto; padding: 1rem;">
         <div style="max-width: 600px; margin: 2rem auto; background: var(--bg-card); border-radius: 1.5rem; padding: 2rem; border: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; margin: 0;">🚨 Segnala Malfunzionamento</h2>
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; margin: 0;">Segnala Malfunzionamento</h2>
                 <button onclick="closeMalfunctionModal()" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: background 0.3s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='none'">✕</button>
             </div>
             
@@ -710,28 +702,28 @@
                     <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
                         <input type="radio" name="malfunctionType" value="camminamento" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
                         <div>
-                            <div style="font-weight: 600;">🚶 Camminamento</div>
+                            <div style="font-weight: 600;">Camminamento</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
                         </div>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
                         <input type="radio" name="malfunctionType" value="corrimano" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
                         <div>
-                            <div style="font-weight: 600;">🤝 Corrimano</div>
+                            <div style="font-weight: 600;">Corrimano</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
                         </div>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
                         <input type="radio" name="malfunctionType" value="segnaletica_uscita" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
                         <div>
-                            <div style="font-weight: 600;">🚪 Segnaletica di Uscita</div>
+                            <div style="font-weight: 600;">Segnaletica di Uscita</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
                         </div>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
                         <input type="radio" name="malfunctionType" value="illuminazione" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
                         <div>
-                            <div style="font-weight: 600;">💡 Impianto di Illuminazione</div>
+                            <div style="font-weight: 600;">Impianto di Illuminazione</div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">Specifica tipo guasto + progressiva chilometrica</div>
                         </div>
                     </label>
@@ -744,11 +736,11 @@
                 <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <input type="radio" name="lightingType" value="fungo_blu" style="width: 20px; height: 20px; cursor: pointer;">
-                        <span>🔵 Fungo Blu</span>
+                        <span>Fungo Blu</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <input type="radio" name="lightingType" value="corpi_illuminanti" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleLightingTypeChange()">
-                        <span>💡 Corpi Illuminanti</span>
+                        <span>Corpi Illuminanti</span>
                     </label>
                 </div>
                 <div id="lightingBodyCount" style="display: none;">
@@ -767,7 +759,7 @@
             <div id="photoFields" style="display: none; margin-bottom: 1.5rem;">
                 <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Foto del Malfunzionamento *</label>
                 <button onclick="captureMalfunctionPhoto()" class="btn btn-secondary" style="width: 100%; justify-content: center;">
-                    📷 Scatta Foto
+                    Scatta Foto
                 </button>
                 <div id="malfunctionPhotoPreview" style="margin-top: 0.75rem;"></div>
             </div>
@@ -1542,50 +1534,57 @@
  const TECHNOLOGICAL_FACILITIES = {
   // Idranti VVF (VVF Hydrants)
   'idranti_vvf': new Set([
-   '55+575 D',
-   '55+425 D',
-   '55+275 D',
-   '55+175 D',
-   '55+024 D',
-   '54+874 D',
-   '54+774 D',
-   '54+674 D',
-   '54+574 D',
-   '54+424 D',
-   '54+324 D',
-   '54+174 D',
-   '54+024 D'
+   // Binario D
+   '55+575 D', '55+425 D', '55+275 D', '55+175 D', '55+024 D', '54+874 D', '54+774 D', 
+   '54+674 D', '54+574 D', '54+424 D', '54+324 D', '54+174 D', '54+024 D', '53+773 D', 
+   '53+623 D', '53+473 D', '53+373 D', '53+223 D', '53+073 D', '52+921 D', '52+771 D', 
+   '52+671 D', '52+521 D', '52+371 D', '52+221 D', '52+121 D', '51+969 D', '51+869 D', 
+   '51+719 D', '51+619 D', '51+469 D', '51+319 D', '51+169 D', '51+019 D', '50+871 D', 
+   '50+721 D', '50+572 D', '50+472 D', '50+322 D', '50+223 D', '50+073 D', '49+973 D', 
+   '49+824 D', '49+674 D', '49+524 D', '49+374 D', '49+224 D', '49+074 D', '48+924 D', 
+   '48+824 D', '48+674 D', '48+574 D', '48+524 D', '48+424 D', '48+324 D', '48+224 D', 
+   '48+074 D', '47+924 D', '47+824 D',
+   // Binario P
+   '47+724 P', '47+649 P', '47+524 P', '47+273 P', '47+173 P', '47+025 P', '46+697 P', 
+   '46+597 P', '46+447 P', '46+208 P', '46+058 P', '45+908 P', '45+758 P', '45+658 P', 
+   '45+508 P', '45+408 P', '45+308 P', '45+158 P', '45+058 P'
   ]),
   // Colonnine TEM (TEM Columns)
   'colonnine_tem': new Set([
-   '53+773 D',
-   '53+623 D',
-   '53+473 D',
-   '53+373 D',
-   '53+223 D',
-   '53+073 D',
-   '47+724 P',
-   '47+649 P',
-   '47+524 P',
-   '47+273 P',
-   '47+173 P',
-   '47+025 P',
-   '46+697 P'
+   // Binario D
+   '55+475 D', '55+024 D', '54+524 D', '54+024 D', '53+523 D', '53+023 D', '52+521 D', 
+   '52+471 D', '51+469 D', '51+419 D', '50+622 D', '50+572 D', '49+674 D', '49+624 D', 
+   '49+574 D', '48+074 D', '47+574 D', '47+050 D', '46+431 D', '45+786 D', '45+283 D', 
+   '45+033 D', '44+533 D', '44+038 D', '43+488 D', '42+988 D', '42+538 D', '42+038 D', 
+   '41+786 D', '41+333 D', '40+832 D', '40+338 D', '40+088 D', '39+538 D', '39+038 D', 
+   '38+588 D', '38+038 D', '37+538 D',
+   // Binario P
+   '55+742 P', '55+400 P', '55+150 P', '54+899 P', '54+599 P', '54+349 P', '54+099 P', 
+   '53+847 P', '53+597 P', '53+347 P', '53+097 P', '52+846 P', '52+646 P', '52+396 P', 
+   '52+146 P', '51+894 P', '51+644 P', '51+394 P', '51+144 P', '50+845 P', '50+647 P', 
+   '50+397 P', '50+098 P', '49+849 P', '49+549 P', '49+349 P', '49+099 P', '48+849 P', 
+   '48+649 P', '48+449 P', '48+249 P', '47+799 P', '47+649 P', '47+499 P', '47+223 P', 
+   '46+855 P', '46+800 P', '46+497 P', '46+232 P', '45+958 P', '45+708 P', '45+458 P', 
+   '45+258 P', '44+958 P', '44+708 P', '44+458 P', '44+219 P', '44+019 P', '43+813 P', 
+   '43+563 P', '43+313 P', '43+088 P', '42+813 P', '42+563 P', '42+313 P', '42+063 P', 
+   '41+757 P', '41+513 P', '41+259 P', '41+013 P', '40+763 P', '40+513 P', '40+263 P', 
+   '40+013 P', '39+763 P', '39+563 P', '39+313 P', '39+113 P', '38+863 P', '38+663 P', 
+   '38+413 P', '38+163 P', '37+913 P', '37+663 P', '37+413 P', '37+259 P'
   ]),
   // Quadri di soccorso VVF (VVF Emergency Panels)
   'quadri_soccorso_vvf': new Set([
-   '46+597 P',
-   '46+447 P',
-   '46+208 P',
-   '46+058 P',
-   '45+908 P',
-   '45+758 P',
-   '45+658 P',
-   '45+508 P',
-   '45+408 P',
-   '45+308 P',
-   '45+158 P',
-   '45+058 P'
+   // Solo Binario D
+   '55+742 D', '55+400 D', '55+150 D', '54+899 D', '54+599 D', '54+349 D', '54+099 D', 
+   '53+847 D', '53+597 D', '53+347 D', '53+097 D', '52+846 D', '52+646 D', '52+396 D', 
+   '52+146 D', '51+894 D', '51+644 D', '51+394 D', '51+144 D', '50+845 D', '50+647 D', 
+   '50+397 D', '50+098 D', '49+849 D', '49+549 D', '49+349 D', '49+099 D', '48+849 D', 
+   '48+649 D', '48+449 D', '48+249 D', '47+799 D', '47+649 D', '47+499 D', '47+223 D', 
+   '46+855 D', '46+800 D', '46+497 D', '46+232 D', '45+958 D', '45+708 D', '45+458 D', 
+   '45+258 D', '44+958 D', '44+708 D', '44+458 D', '44+219 D', '44+019 D', '43+813 D', 
+   '43+563 D', '43+313 D', '43+088 D', '42+813 D', '42+563 D', '42+313 D', '42+063 D', 
+   '41+757 D', '41+513 D', '41+259 D', '41+013 D', '40+763 D', '40+513 D', '40+263 D', 
+   '40+013 D', '39+763 D', '39+563 D', '39+313 D', '39+113 D', '38+863 D', '38+663 D', 
+   '38+413 D', '38+163 D', '37+913 D', '37+663 D', '37+413 D', '37+259 D'
   ])
  };
 
@@ -1700,6 +1699,7 @@
                 // Show main screen
                 document.getElementById('startScreen').style.display = 'none';
                 document.getElementById('mainScreen').style.display = 'block';
+                document.getElementById('floatingMalfunctionBtn').style.display = 'flex';
                 
                 showToast('Verifica iniziata!', 'success');
             });
@@ -1779,14 +1779,13 @@
                     <div class="check-content">
                         <div class="check-title">${item.title}</div>
                         <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                            <span style="font-weight: 600; color: var(--warning);">📦 ${item.description}</span>
+                            <span style="font-weight: 600; color: var(--warning);">${item.description}</span>
                         </div>
                         
                         <!-- Stato dell'apprestamento -->
                         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🔧</span>
-                                <span>Stato dell'apprestamento</span>
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Stato dell'apprestamento
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
                                 Verifica lo stato generale dell'apprestamento tecnologico
@@ -1796,22 +1795,21 @@
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="statoApprestamento-${item.id}" value="conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Conforme</span>
+                                    <span style="font-weight: 500;">Conforme</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="statoApprestamento-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Non Conforme</span>
+                                    <span style="font-weight: 500;">Non Conforme</span>
                                 </label>
                             </div>
                         </div>
                         
                         <!-- Verifica manomissione sigillo -->
                         <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🔒</span>
-                                <span>Verifica manomissione sigillo</span>
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Verifica manomissione sigillo
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
                                 Controlla se il sigillo è integro e non è stato manomesso
@@ -1821,22 +1819,21 @@
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="sigillo-${item.id}" value="integro" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Integro</span>
+                                    <span style="font-weight: 500;">Integro</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="sigillo-${item.id}" value="manomesso" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Manomesso</span>
+                                    <span style="font-weight: 500;">Manomesso</span>
                                 </label>
                             </div>
                         </div>
                         
                         <!-- Presenza segnaletica di riferimento -->
                         <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🚨</span>
-                                <span>Presenza segnaletica di riferimento</span>
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Presenza segnaletica di riferimento
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
                                 Verifica la presenza della segnaletica di riferimento per l'apprestamento
@@ -1846,13 +1843,13 @@
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="segnaletica-${item.id}" value="presente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Presente</span>
+                                    <span style="font-weight: 500;">Presente</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
                                     <input type="radio" name="segnaletica-${item.id}" value="assente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Assente</span>
+                                    <span style="font-weight: 500;">Assente</span>
                                 </label>
                             </div>
                         </div>
@@ -2201,7 +2198,7 @@
                 const date = new Date(itemData.timestamp);
                 metaHtml += `
                     <div class="meta-item">
-                        <span class="meta-icon">🕐</span>
+                        <span class="meta-icon">⏱</span>
                         <span>${date.toLocaleString('it-IT')}</span>
                     </div>
                 `;
@@ -2209,7 +2206,7 @@
             
             if (itemData.checks) {
                 if (itemData.checks.statoApprestamento) {
-                    const icon = itemData.checks.statoApprestamento === 'conforme' ? '✅' : '⚠️';
+                    const icon = itemData.checks.statoApprestamento === 'conforme' ? '✓' : '✗';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
@@ -2219,7 +2216,7 @@
                 }
                 
                 if (itemData.checks.sigillo) {
-                    const icon = itemData.checks.sigillo === 'integro' ? '✅' : '⚠️';
+                    const icon = itemData.checks.sigillo === 'integro' ? '✓' : '✗';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
@@ -2229,7 +2226,7 @@
                 }
                 
                 if (itemData.checks.segnaletica) {
-                    const icon = itemData.checks.segnaletica === 'presente' ? '✅' : '⚠️';
+                    const icon = itemData.checks.segnaletica === 'presente' ? '✓' : '✗';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
