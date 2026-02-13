@@ -2365,10 +2365,16 @@ function updatePaginationUI() {
                 : 'Vernio (37+200)';
             report += `Direzione: Verso ${directionText}\n`;
             
+            const trackFilterText = selectedTrackFilter === 'both' ? 'Entrambi (Pari e Dispari)' :
+                                    selectedTrackFilter === 'P' ? 'Solo Binario Pari' : 'Solo Binario Dispari';
+            report += `Binari Verificati: ${trackFilterText}\n`;
+            
             const totalNiches = checklistData.length;
             const completedNiches = checklistData.filter(i => i.completed).length;
             const needsMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+                return i.checks?.illuminazione === 'manutenzione' || 
+                       i.checks?.corrimano === 'manutenzione' || 
+                       i.checks?.camminamento === 'manutenzione';
             }).length;
             
             report += `Nicchie Verificate: ${completedNiches}/${totalNiches}\n`;
@@ -2379,7 +2385,9 @@ function updatePaginationUI() {
             
             // Summary of maintenance needed
             const nichesNeedingMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+                return i.checks?.illuminazione === 'manutenzione' || 
+                       i.checks?.corrimano === 'manutenzione' || 
+                       i.checks?.camminamento === 'manutenzione';
             });
             
             if (nichesNeedingMaintenance.length > 0) {
@@ -2387,24 +2395,28 @@ function updatePaginationUI() {
                 
                 nichesNeedingMaintenance.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    report += `Km ${niche.km} - Binario ${niche.binario}\n`;
+                    const isOdd = isOddNiche(niche.km);
+                    const camminamentoType = isOdd ? 'Pari' : 'Dispari';
                     
-                    if (item.checks.segnaletica === 'manutenzione') {
-                        const photoCount = item.photosByType?.segnaletica?.length || 0;
-                        report += `   ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione`;
+                    report += `Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Nicchia Dispari' : 'Nicchia Pari'})\n`;
+                    
+                    if (item.checks.illuminazione === 'manutenzione') {
+                        const photoCount = item.photosByType?.illuminazione?.length || 0;
+                        report += `   ⚠️ ILLUMINAZIONE - Necessita Manutenzione`;
                         if (photoCount > 0) report += ` (${photoCount} foto)`;
                         report += '\n';
                     }
                     
-                    if (item.checks.vvf === 'non_conforme') {
- const photoCount = item.photosByType?.vvf?.length || 0;
- report += ` ⚠️ ANTINCENDIO VV.F. (MANICHETTE + SEGNALETICA) - Assente / non conforme`;
- if (photoCount > 0) report += ` (${photoCount} foto)`;
- report += '\n';
- }
- if (item.checks.illuminazione === 'manutenzione') {
-                        const photoCount = item.photosByType?.illuminazione?.length || 0;
-                        report += `   ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione`;
+                    if (item.checks.corrimano === 'manutenzione') {
+                        const photoCount = item.photosByType?.corrimano?.length || 0;
+                        report += `   ⚠️ CORRIMANO - Necessita Manutenzione`;
+                        if (photoCount > 0) report += ` (${photoCount} foto)`;
+                        report += '\n';
+                    }
+                    
+ if (item.checks.camminamento === 'manutenzione') {
+                        const photoCount = item.photosByType?.camminamento?.length || 0;
+                        report += `   ⚠️ CAMMINAMENTO INTERNICCHIALE ${camminamentoType.toUpperCase()} - Necessita Manutenzione`;
                         if (photoCount > 0) report += ` (${photoCount} foto)`;
                         report += '\n';
                     }
@@ -2423,21 +2435,24 @@ function updatePaginationUI() {
             
             checklistData.forEach((item, index) => {
                 const niche = filteredNiches.find(n => n.id === item.id);
-                report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario}\n`;
+                const isOdd = isOddNiche(niche.km);
+                const camminamentoType = isOdd ? 'Pari' : 'Dispari';
+                
+                report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario} (${isOdd ? 'Nicchia Dispari' : 'Nicchia Pari'})\n`;
                 report += `   Stato: ${item.completed ? '✅ VERIFICATA' : '⏳ DA VERIFICARE'}\n`;
                 
                 if (item.checks) {
-                    if (item.checks.segnaletica) {
-                        const status = item.checks.segnaletica === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Segnaletica Uscite Emergenza: ${status}\n`;
+                    if (item.checks.illuminazione) {
+                        const status = item.checks.illuminazione === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
+                        report += `   Illuminazione: ${status}\n`;
                     }
-                    if (item.checks.vvf && (filteredNiches.find(n => n.id === item.id)?.isVvfSpecial)) {
- const status = item.checks.vvf === 'presente' ? '✅ Presente e segnaletica OK' : '⚠️ Assente / non conforme';
- report += ` Antincendio VV.F. (manichette + segnaletica): ${status}\n`;
- }
- if (item.checks.illuminazione) {
-                        const status = item.checks.illuminazione === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Illuminazione Emergenza (12,5m): ${status}\n`;
+                    if (item.checks.corrimano) {
+                        const status = item.checks.corrimano === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
+                        report += `   Corrimano: ${status}\n`;
+                    }
+ if (item.checks.camminamento) {
+                        const status = item.checks.camminamento === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
+                        report += `   Camminamento Internicchiale ${camminamentoType}: ${status}\n`;
                     }
                 }
                 
@@ -2446,11 +2461,12 @@ function updatePaginationUI() {
                 }
                 
                 const photos = item.photosByType || {};
-                const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
+                const totalPhotos = (photos.illuminazione?.length || 0) + (photos.corrimano?.length || 0) + (photos.camminamento?.length || 0);
                 if (totalPhotos > 0) {
                     report += `   Foto Allegate: ${totalPhotos}\n`;
-                    if (photos.segnaletica?.length > 0) report += `     - Segnaletica: ${photos.segnaletica.length}\n`;
                     if (photos.illuminazione?.length > 0) report += `     - Illuminazione: ${photos.illuminazione.length}\n`;
+                    if (photos.corrimano?.length > 0) report += `     - Corrimano: ${photos.corrimano.length}\n`;
+                    if (photos.camminamento?.length > 0) report += `     - Camminamento: ${photos.camminamento.length}\n`;
                     if (photos.general?.length > 0) report += `     - Generali: ${photos.general.length}\n`;
                 }
                 
@@ -2459,8 +2475,9 @@ function updatePaginationUI() {
             
             report += '\n='.repeat(60) + '\n';
             report += 'Note Tecniche:\n';
-            report += '- Segnaletica: Indica le uscite di emergenza in galleria\n';
-            report += '- Illuminazione: Corpi illuminanti sopra corrimano a distanza 12,5m\n';
+            report += '- Illuminazione: Verifica dello stato dell\'illuminazione\n';
+            report += '- Corrimano: Verifica dello stato del corrimano\n';
+            report += '- Camminamento Internicchiale: Verifica del camminamento tra nicchie (Pari per nicchie dispari, Dispari per nicchie pari)\n';
             report += '\nFine Report\n';
             report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
             
