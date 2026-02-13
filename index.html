@@ -1572,14 +1572,28 @@
 ]);
 
         const CHECKLIST_ITEMS = NICHES_RAW_DATA.split('\n')
-            .map((line, index) => {
+            .map((line, index, array) => {
                 const parts = line.trim().split(' ');
                 if (parts.length === 2) {
+                    // Get next niche km for title
+                    let nextKm = null;
+                    if (index + 1 < array.length) {
+                        const nextLine = array[index + 1].trim().split(' ');
+                        if (nextLine.length === 2) {
+                            nextKm = nextLine[0];
+                        }
+                    }
+                    
+                    // Create title with range
+                    const title = nextKm 
+                        ? `Tratta fra la nicchia al km ${parts[0]} e il km ${nextKm} - ${parts[1]}`
+                        : `Nicchia al km ${parts[0]} - ${parts[1]}`;
+                    
                     return {
                         id: index + 1,
                         km: parts[0],
                         binario: parts[1],
-                        title: `Nicchia km ${parts[0]} - Binario ${parts[1]}`,
+                        title: title,
                         description: `Verifica Segnaletica e Illuminazione`,
       isVvfSpecial: VVF_SPECIAL_SET.has(`${parts[0]} ${parts[1]}`)
                     };
@@ -1766,7 +1780,9 @@
                         corrimano: false,
                         camminamento: false
                     },
-                    notes: ''
+                    notes: '',
+                    illuminazioneFixtureCount: null,
+                    illuminazioneFixtureNotes: ''
                 };
                 
                 checklistData.push(itemData);
@@ -1815,9 +1831,7 @@
             div.id = `item-${niche.id}`;
             div.style.marginBottom = '1.5rem';
             
-            const camminamentoLabel = camminamentoType === 'pari' ? 
-                'Camminamento Internicchiale Pari' : 
-                'Camminamento Internicchiale Dispari';
+            const camminamentoLabel = 'Camminamento';
             
             div.innerHTML = `
                 <div class="check-header">
@@ -1840,6 +1854,30 @@
                                            style="width: 20px; height: 20px; cursor: pointer;">
                                     <span style="font-weight: 500;">⚠️ Manutenzione</span>
                                 </label>
+                            </div>
+                            <div id="illuminazione-details-${niche.id}" style="margin-top: 0.75rem; display: none;">
+                                <div style="margin-bottom: 0.75rem;">
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem;">
+                                        Quanti corpi illuminanti non funzionano?
+                                    </label>
+                                    <input type="number" 
+                                           id="fixture-count-${niche.id}" 
+                                           min="0" 
+                                           placeholder="Es: 2"
+                                           style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1rem;"
+                                           onchange="updateFixtureCount(${niche.id}, this.value)">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem;">
+                                        Note (numero dei corpi illuminanti)
+                                    </label>
+                                    <textarea 
+                                        id="fixture-notes-${niche.id}" 
+                                        rows="2" 
+                                        placeholder="Es: corpo illuminante n. 3 e n. 7"
+                                        style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 0.9rem; resize: vertical;"
+                                        onchange="updateFixtureNotes(${niche.id}, this.value)"></textarea>
+                                </div>
                             </div>
                             <div id="photo-btn-illuminazione-${niche.id}" style="margin-top: 0.5rem; display: none;">
                                 <button class="btn btn-secondary" onclick="capturePhoto(${niche.id}, 'illuminazione')" style="width: 100%; justify-content: center; font-size: 0.875rem; padding: 0.5rem;">
@@ -2060,6 +2098,21 @@
             
             itemData.checks[type] = value;
             
+            // Show/hide illuminazione details if type is illuminazione
+            if (type === 'illuminazione') {
+                const detailsDiv = document.getElementById(`illuminazione-details-${id}`);
+                if (detailsDiv) {
+                    if (value === 'manutenzione') {
+                        detailsDiv.style.display = 'block';
+                    } else {
+                        detailsDiv.style.display = 'none';
+                        // Clear fixture data if switching to funzionante
+                        itemData.illuminazioneFixtureCount = null;
+                        itemData.illuminazioneFixtureNotes = '';
+                    }
+                }
+            }
+            
             // Show/hide photo button based on selection
             const photoBtnId = `photo-btn-${type}-${id}`;
  const photoBtn = document.getElementById(photoBtnId);
@@ -2105,6 +2158,24 @@
             updateProgress();
             updateMeta(id);
             saveToLocalStorage();
+        }
+
+        // Update fixture count
+        function updateFixtureCount(id, count) {
+            const itemData = checklistData.find(item => item.id === id);
+            if (itemData) {
+                itemData.illuminazioneFixtureCount = count ? parseInt(count) : null;
+                saveToLocalStorage();
+            }
+        }
+
+        // Update fixture notes
+        function updateFixtureNotes(id, notes) {
+            const itemData = checklistData.find(item => item.id === id);
+            if (itemData) {
+                itemData.illuminazioneFixtureNotes = notes || '';
+                saveToLocalStorage();
+            }
         }
 
         // Capture photo
@@ -2431,8 +2502,14 @@ function updatePaginationUI() {
                     if (item.checks.illuminazione === 'manutenzione') {
                         const photoCount = item.photosByType?.illuminazione?.length || 0;
                         report += `   ⚠️ ILLUMINAZIONE - Necessita Manutenzione`;
+                        if (item.illuminazioneFixtureCount) {
+                            report += ` - ${item.illuminazioneFixtureCount} corpi illuminanti non funzionanti`;
+                        }
                         if (photoCount > 0) report += ` (${photoCount} foto)`;
                         report += '\n';
+                        if (item.illuminazioneFixtureNotes) {
+                            report += `      Note: ${item.illuminazioneFixtureNotes}\n`;
+                        }
                     }
                     
                     if (item.checks.corrimano === 'manutenzione') {
@@ -2444,7 +2521,7 @@ function updatePaginationUI() {
                     
  if (item.checks.camminamento === 'manutenzione') {
                         const photoCount = item.photosByType?.camminamento?.length || 0;
-                        report += `   ⚠️ CAMMINAMENTO INTERNICCHIALE ${camminamentoType.toUpperCase()} - Necessita Manutenzione`;
+                        report += `   ⚠️ CAMMINAMENTO - Necessita Manutenzione`;
                         if (photoCount > 0) report += ` (${photoCount} foto)`;
                         report += '\n';
                     }
@@ -2472,7 +2549,14 @@ function updatePaginationUI() {
                 if (item.checks) {
                     if (item.checks.illuminazione) {
                         const status = item.checks.illuminazione === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
-                        report += `   Illuminazione: ${status}\n`;
+                        report += `   Illuminazione: ${status}`;
+                        if (item.checks.illuminazione === 'manutenzione' && item.illuminazioneFixtureCount) {
+                            report += ` (${item.illuminazioneFixtureCount} corpi illuminanti non funzionanti)`;
+                        }
+                        report += '\n';
+                        if (item.checks.illuminazione === 'manutenzione' && item.illuminazioneFixtureNotes) {
+                            report += `      Note: ${item.illuminazioneFixtureNotes}\n`;
+                        }
                     }
                     if (item.checks.corrimano) {
                         const status = item.checks.corrimano === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
@@ -2480,7 +2564,7 @@ function updatePaginationUI() {
                     }
  if (item.checks.camminamento) {
                         const status = item.checks.camminamento === 'funzionante' ? '✅ OK' : '⚠️ Necessita Manutenzione';
-                        report += `   Camminamento Internicchiale ${camminamentoType}: ${status}\n`;
+                        report += `   Camminamento: ${status}\n`;
                     }
                 }
                 
@@ -2505,7 +2589,7 @@ function updatePaginationUI() {
             report += 'Note Tecniche:\n';
             report += '- Illuminazione: Verifica dello stato dell\'illuminazione\n';
             report += '- Corrimano: Verifica dello stato del corrimano\n';
-            report += '- Camminamento Internicchiale: Verifica del camminamento tra nicchie (Pari per nicchie dispari, Dispari per nicchie pari)\n';
+            report += '- Camminamento: Verifica del camminamento tra nicchie\n';
             report += '\nFine Report\n';
             report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
             
