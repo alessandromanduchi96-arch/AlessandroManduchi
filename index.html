@@ -579,12 +579,12 @@
         <!-- Start Screen -->
         <div id="startScreen" class="card" style="display: block;">
             <header class="header">
-                <h1 class="logo">📍 NicheSafe</h1>
+                <h1 class="logo">NicheSafe</h1>
                 <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
             </header>
             
             <h2 class="section-title" style="margin-top: 2rem;">
-                <span class="section-icon">🚀</span>
+                <span class="section-icon"></span>
                 Inizia Verifica
             </h2>
             
@@ -603,14 +603,14 @@
                 </label>
                 <select id="direction" class="email-input" style="cursor: pointer;">
                     <option value="">-- Seleziona direzione --</option>
-                    <option value="san_benedetto">⬆️ Verso San Benedetto Val di Sambro (55+742)</option>
-                    <option value="vernio">⬇️ Verso Vernio (37+200)</option>
+                    <option value="san_benedetto">Verso San Benedetto Val di Sambro (55+742)</option>
+                    <option value="vernio">Verso Vernio (37+200)</option>
                 </select>
             </div>
             
             <div style="text-align: center;">
                 <button class="btn btn-primary" id="startBtn" disabled>
-                    <span>▶️</span>
+                    <span></span>
                     <span>Inizia Verifica</span>
                 </button>
             </div>
@@ -619,7 +619,7 @@
         <!-- Main Screen -->
         <div id="mainScreen" style="display: none;">
         <header class="header">
-            <h1 class="logo">📍 NicheSafe</h1>
+            <h1 class="logo">NicheSafe</h1>
             <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
         </header>
         
@@ -629,14 +629,14 @@
                 <span id="statusText">Controllo connessione...</span>
             </div>
             <div class="status-badge">
-                <span>📋</span>
+                <span></span>
                 <span id="directionInfo">Direzione non impostata</span>
             </div>
         </div>
         
         <div class="card">
             <h2 class="section-title">
-                <span class="section-icon">🚇</span>
+                <span class="section-icon"></span>
                 Nicchie da Verificare
             </h2>
             
@@ -646,7 +646,7 @@
 
  <div id="paginationControls" style="margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
   <button class="btn btn-secondary" id="loadMoreBtn" type="button" style="min-width: 220px; justify-content: center;">
-    ➕ Mostra altre 10
+    Mostra altre 10
   </button>
   <div id="shownCount" style="color: var(--text-secondary); font-size: 0.9rem;">
     Mostrate 0/0
@@ -666,11 +666,11 @@
             
             <div class="submit-section">
   <div style="margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">
-    📩 Destinatario report: <b id="fixedRecipient">a.manduchi@rfi.it</b>
+    Destinatario report: <b id="fixedRecipient">a.manduchi@rfi.it</b>
   </div>
   <input type="email" class="email-input hidden" id="emailInput" value="a.manduchi@rfi.it">
   <button class="btn btn-primary" id="submitBtn">
-                    <span>📧</span>
+                    <span></span>
                     <span>Invia Report via Email</span>
                 </button>
 </div>
@@ -1646,7 +1646,7 @@
                         <!-- Segnaletica Section -->
                         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
                             <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🚨</span>
+                                <span></span>
                                 <span>Segnaletica Uscite di Emergenza</span>
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
@@ -1669,7 +1669,7 @@
                             
                             <div id="photo-btn-seg-${item.id}" style="margin-top: 1rem; display: none;">
                                 <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'segnaletica')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Segnaletica
+                                    Scatta Foto Segnaletica
                                 </button>
                             </div>
                         </div>
@@ -1677,7 +1677,7 @@
                         <!-- Illuminazione Section -->
                         <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
                             <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>💡</span>
+                                <span></span>
                                 <span>Illuminazione di Emergenza</span>
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
@@ -1700,7 +1700,7 @@
                             
                             <div id="photo-btn-ill-${item.id}" style="margin-top: 1rem; display: none;">
                                 <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'illuminazione')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Illuminazione
+                                    Scatta Foto Illuminazione
                                 </button>
                             </div>
                         </div>
@@ -1710,7 +1710,7 @@
  <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
   <div style="display:flex; justify-content: space-between; align-items:center; gap: 0.75rem;">
    <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-    <span>🔥</span>
+    <span></span>
     <span>Antincendio VV.F. (Manichette + Segnaletica)</span>
    </div>
    <span class="vvf-badge">Check extra</span>
@@ -1729,7 +1729,7 @@
    </label>
   </div>
   <div id="photo-btn-vvf-${item.id}" style="margin-top: 1rem; display: none;">
-   <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'vvf')" style="width: 100%; justify-content: center;">📷 Scatta Foto VV.F.</button>
+   <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'vvf')" style="width: 100%; justify-content: center;">Scatta Foto VV.F.</button>
   </div>
  </div>
 ` : ``}
@@ -1885,7 +1885,7 @@
             
             // Segnaletica photos
             if (itemData.photosByType.segnaletica?.length > 0) {
-                html += '<div style="margin-bottom: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">🚫 Segnaletica Mancante:</div>';
+                html += '<div style="margin-bottom: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Segnaletica Mancante:</div>';
                 itemData.photosByType.segnaletica.forEach((photo, index) => {
                     html += `<img src="${photo.data}" class="photo-thumbnail" alt="Segnaletica ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
                 });
@@ -1893,7 +1893,7 @@
             
             // Illuminazione photos
             if (itemData.photosByType.illuminazione?.length > 0) {
-                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">💡 Illuminazione Mancante:</div>';
+                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Illuminazione Mancante:</div>';
                 itemData.photosByType.illuminazione.forEach((photo, index) => {
                     html += `<img src="${photo.data}" class="photo-thumbnail" alt="Illuminazione ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
                 });
@@ -1901,7 +1901,7 @@
             
             // VVF photos
  if (itemData.photosByType.vvf?.length > 0) {
-  html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">🔥 VV.F. / Manichette:</div>';
+  html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">VV.F. / Manichette:</div>';
   itemData.photosByType.vvf.forEach((photo, index) => {
     html += `<img src="${photo.data}" class="photo-thumbnail" alt="VVF ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
   });
@@ -1909,7 +1909,7 @@
 
  // General photos
             if (itemData.photosByType.general?.length > 0) {
-                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">📷 Altre Foto:</div>';
+                html += '<div style="margin-bottom: 0.5rem; margin-top: 0.5rem; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary);">Altre Foto:</div>';
                 itemData.photosByType.general.forEach((photo, index) => {
                     html += `<img src="${photo.data}" class="photo-thumbnail" alt="Generale ${index + 1}" onclick="viewPhoto('${photo.data}')">`;
                 });
@@ -1935,7 +1935,7 @@
                 const date = new Date(itemData.timestamp);
                 metaHtml += `
                     <div class="meta-item">
-                        <span class="meta-icon">🕐</span>
+                        <span class="meta-icon"></span>
                         <span>${date.toLocaleString('it-IT')}</span>
                     </div>
                 `;
@@ -1977,7 +1977,7 @@
             if (totalPhotos > 0) {
                 metaHtml += `
                     <div class="meta-item">
-                        <span class="meta-icon">📷</span>
+                        <span class="meta-icon"></span>
                         <span>${totalPhotos} foto</span>
                     </div>
                 `;
@@ -2021,7 +2021,7 @@ function updatePaginationUI() {
     } else {
       btn.style.display = 'inline-flex';
       const nextEnd = Math.min(end + pageSize, total);
-      btn.textContent = `➕ Mostra altre 10 (${end + 1}-${nextEnd})`;
+      btn.textContent = `Mostra altre 10 (${end + 1}-${nextEnd})`;
     }
   }
 }
@@ -2128,7 +2128,7 @@ function updatePaginationUI() {
                 
                 nichesNeedingMaintenance.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    report += `📍 ${niche.km} - Binario ${niche.binario}\n`;
+                    report += `Km ${niche.km} - Binario ${niche.binario}\n`;
                     
                     if (item.checks.segnaletica === 'manutenzione') {
                         const photoCount = item.photosByType?.segnaletica?.length || 0;
