@@ -728,23 +728,9 @@
                 Verifica Nicchie - Vista Divisa
             </h2>
             
-            <!-- Split Screen Container -->
-            <div class="split-container">
-                <!-- Left Panel: Binario D (Dispari) -->
-                <div class="split-panel">
-                    <div class="panel-title">Binario D - Nicchie Dispari</div>
-                    <div id="oddNiches"></div>
-                </div>
-                
-                <!-- Right Panel: Binario P (Pari) -->
-                <div class="split-panel">
-                    <div class="panel-title">Binario P - Nicchie Pari</div>
-                    <div id="evenNiches"></div>
-                </div>
-            </div>
-            
-            <div class="checklist" id="checklist" style="display: none;">
-                <!-- Items will be added here -->
+            <!-- Sequential Display Container -->
+            <div class="checklist" id="checklist">
+                <!-- Items will be added here in sequential order -->
             </div>
 
  <div id="paginationControls" style="margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
@@ -784,6 +770,9 @@
     
     <!-- Hidden file input for camera -->
     <input type="file" accept="image/*" capture="environment" class="hidden" id="cameraInput">
+
+    <!-- PDF Export Libraries -->
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
 
     <script>
         // Configuration - Railway Niches Data
@@ -1717,7 +1706,7 @@
                 modal.style.display = 'none';
                 
                 // Re-render with new filter
-                renderSplitScreen();
+                renderSequentialList();
                 showToast('Filtro binari aggiornato', 'success');
             });
         }
@@ -1788,18 +1777,16 @@
                 checklistData.push(itemData);
             });
             
-            // Render split screen
-            renderSplitScreen();
+            // Render sequential list
+            renderSequentialList();
         }
         
-        // Render split screen with odd/even niches
-        function renderSplitScreen() {
-            const oddContainer = document.getElementById('oddNiches');
-            const evenContainer = document.getElementById('evenNiches');
-            oddContainer.innerHTML = '';
-            evenContainer.innerHTML = '';
+        // Render items in sequential order
+        function renderSequentialList() {
+            const container = document.getElementById('checklist');
+            container.innerHTML = '';
             
-            // Filter niches based on track filter and odd/even
+            // Filter and render niches in sequential order
             filteredNiches.forEach(niche => {
                 // Apply track filter
                 if (selectedTrackFilter !== 'both' && niche.binario !== selectedTrackFilter) {
@@ -1809,18 +1796,10 @@
                 const itemData = checklistData.find(d => d.id === niche.id);
                 if (!itemData) return;
                 
-                // Determine if odd or even based on binario (D = Dispari, P = Pari)
-                if (isOddNiche(niche)) {
-                    // Binario D (Dispari) - goes to left panel
-                    // Fields: Illuminazione, Corrimano, Camminamento internicchiale DISPARI
-                    const itemEl = createNicheItem(niche, itemData, 'dispari');
-                    oddContainer.appendChild(itemEl);
-                } else {
-                    // Binario P (Pari) - goes to right panel
-                    // Fields: Illuminazione, Corrimano, Camminamento internicchiale PARI
-                    const itemEl = createNicheItem(niche, itemData, 'pari');
-                    evenContainer.appendChild(itemEl);
-                }
+                // Create niche item (camminamentoType still used for compatibility but not displayed)
+                const camminamentoType = isOddNiche(niche) ? 'dispari' : 'pari';
+                const itemEl = createNicheItem(niche, itemData, camminamentoType);
+                container.appendChild(itemEl);
             });
         }
         
@@ -2424,6 +2403,9 @@ function updatePaginationUI() {
                 return;
             }
             
+            // Generate PDF report
+            await generatePDFReport();
+            
             const email = 'a.manduchi@rfi.it';
             if (!email || !email.includes('@')) {
                 showToast('Inserisci un indirizzo email valido', 'error');
@@ -2438,7 +2420,7 @@ function updatePaginationUI() {
             const body = encodeURIComponent(report);
             
             // Show success message
-            showToast('Report generato! Apertura client email...', 'success');
+            showToast('Report generato! PDF scaricato. Apertura client email...', 'success');
             
             // Open mailto
             setTimeout(() => {
@@ -2594,6 +2576,184 @@ function updatePaginationUI() {
             report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
             
             return report;
+        }
+
+        // Generate PDF report with photos
+        async function generatePDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 20;
+            const contentWidth = pageWidth - 2 * margin;
+            
+            // Helper function to check if we need a new page
+            const checkNewPage = (requiredSpace = 20) => {
+                if (yPosition + requiredSpace > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = 20;
+                    return true;
+                }
+                return false;
+            };
+            
+            // Title
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text('REPORT VERIFICA NICCHIE DI SICUREZZA GALLERIA', margin, yPosition);
+            yPosition += 10;
+            
+            // Header info
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Data Ispezione: ${new Date().toLocaleString('it-IT')}`, margin, yPosition);
+            yPosition += 6;
+            
+            const directionText = selectedDirection === 'san_benedetto' 
+                ? 'San Benedetto Val di Sambro (55+742)' 
+                : 'Vernio (37+200)';
+            doc.text(`Direzione: Verso ${directionText}`, margin, yPosition);
+            yPosition += 6;
+            
+            const trackFilterText = selectedTrackFilter === 'both' ? 'Entrambi (Pari e Dispari)' :
+                                    selectedTrackFilter === 'P' ? 'Solo Binario Pari' : 'Solo Binario Dispari';
+            doc.text(`Binari Verificati: ${trackFilterText}`, margin, yPosition);
+            yPosition += 10;
+            
+            // Summary
+            const totalNiches = checklistData.length;
+            const completedNiches = checklistData.filter(i => i.completed).length;
+            const needsMaintenance = checklistData.filter(i => {
+                return i.checks?.illuminazione === 'manutenzione' || 
+                       i.checks?.corrimano === 'manutenzione' || 
+                       i.checks?.camminamento === 'manutenzione';
+            }).length;
+            
+            doc.text(`Nicchie Verificate: ${completedNiches}/${totalNiches}`, margin, yPosition);
+            yPosition += 6;
+            doc.text(`Nicchie Necessitano Manutenzione: ${needsMaintenance}`, margin, yPosition);
+            yPosition += 6;
+            doc.text(`Percentuale Completamento: ${Math.round((completedNiches/totalNiches)*100)}%`, margin, yPosition);
+            yPosition += 15;
+            
+            // Maintenance Summary
+            const nichesNeedingMaintenance = checklistData.filter(i => {
+                return i.checks?.illuminazione === 'manutenzione' || 
+                       i.checks?.corrimano === 'manutenzione' || 
+                       i.checks?.camminamento === 'manutenzione';
+            });
+            
+            if (nichesNeedingMaintenance.length > 0) {
+                checkNewPage(30);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE', margin, yPosition);
+                yPosition += 10;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                
+                for (const item of nichesNeedingMaintenance) {
+                    checkNewPage(50);
+                    
+                    const niche = filteredNiches.find(n => n.id === item.id);
+                    const isOdd = isOddNiche(niche);
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`Km ${niche.km} - Binario ${niche.binario}`, margin, yPosition);
+                    yPosition += 6;
+                    doc.setFont(undefined, 'normal');
+                    
+                    if (item.checks.illuminazione === 'manutenzione') {
+                        let text = '  ILLUMINAZIONE - Necessita Manutenzione';
+                        if (item.illuminazioneFixtureCount) {
+                            text += ` - ${item.illuminazioneFixtureCount} corpi illuminanti`;
+                        }
+                        doc.text(text, margin, yPosition);
+                        yPosition += 5;
+                        
+                        if (item.illuminazioneFixtureNotes) {
+                            const lines = doc.splitTextToSize(`    Note: ${item.illuminazioneFixtureNotes}`, contentWidth - 10);
+                            doc.text(lines, margin, yPosition);
+                            yPosition += lines.length * 5;
+                        }
+                        
+                        // Add photos for illuminazione
+                        if (item.photosByType?.illuminazione?.length > 0) {
+                            yPosition += 5;
+                            for (const photo of item.photosByType.illuminazione) {
+                                checkNewPage(70);
+                                try {
+                                    const imgWidth = 80;
+                                    const imgHeight = 60;
+                                    doc.addImage(photo, 'JPEG', margin + 10, yPosition, imgWidth, imgHeight);
+                                    yPosition += imgHeight + 5;
+                                } catch (e) {
+                                    console.error('Error adding image:', e);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (item.checks.corrimano === 'manutenzione') {
+                        checkNewPage(10);
+                        doc.text('  CORRIMANO - Necessita Manutenzione', margin, yPosition);
+                        yPosition += 5;
+                        
+                        // Add photos for corrimano
+                        if (item.photosByType?.corrimano?.length > 0) {
+                            yPosition += 5;
+                            for (const photo of item.photosByType.corrimano) {
+                                checkNewPage(70);
+                                try {
+                                    const imgWidth = 80;
+                                    const imgHeight = 60;
+                                    doc.addImage(photo, 'JPEG', margin + 10, yPosition, imgWidth, imgHeight);
+                                    yPosition += imgHeight + 5;
+                                } catch (e) {
+                                    console.error('Error adding image:', e);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (item.checks.camminamento === 'manutenzione') {
+                        checkNewPage(10);
+                        doc.text('  CAMMINAMENTO - Necessita Manutenzione', margin, yPosition);
+                        yPosition += 5;
+                        
+                        // Add photos for camminamento
+                        if (item.photosByType?.camminamento?.length > 0) {
+                            yPosition += 5;
+                            for (const photo of item.photosByType.camminamento) {
+                                checkNewPage(70);
+                                try {
+                                    const imgWidth = 80;
+                                    const imgHeight = 60;
+                                    doc.addImage(photo, 'JPEG', margin + 10, yPosition, imgWidth, imgHeight);
+                                    yPosition += imgHeight + 5;
+                                } catch (e) {
+                                    console.error('Error adding image:', e);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (item.timestamp) {
+                        checkNewPage(10);
+                        doc.text(`  Verificato: ${new Date(item.timestamp).toLocaleString('it-IT')}`, margin, yPosition);
+                        yPosition += 5;
+                    }
+                    
+                    yPosition += 5;
+                }
+            }
+            
+            // Save PDF
+            const fileName = `Report_Nicchie_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+            showToast('PDF generato con successo!', 'success');
         }
 
         // LocalStorage functions
