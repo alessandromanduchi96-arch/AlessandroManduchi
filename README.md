@@ -1,25 +1,30 @@
-# NicheSafe - Verifica Nicchie di Sicurezza Galleria Ferroviaria
+# NicheSafe - Verifica Apprestamenti Tecnologici Galleria Ferroviaria
 
-Progressive Web App specializzata per la verifica delle nicchie di sicurezza nelle gallerie ferroviarie.
+Progressive Web App specializzata per la verifica degli apprestamenti tecnologici nelle gallerie ferroviarie.
 
 ## 🚇 Caratteristiche
 
-- 📋 **740 Nicchie Pre-caricate** (km 37+259 → 55+742)
+- 📋 **38 Apprestamenti Tecnologici** (km 37+259 → 55+742)
 - 🎯 **Selezione Direzione**: Scegli se vai verso San Benedetto o Vernio
-- 🔍 **Verifiche Specifiche**:
-  - **Segnaletica Uscite di Emergenza**
-  - **Illuminazione di Emergenza** (12,5m tra corpi illuminanti)
-- 📷 **Foto Solo se Necessario**: Richiesta solo per "Necessita Manutenzione"
+- 🔍 **Verifiche Apprestamenti**:
+  - **Idranti VVF** (13 postazioni)
+  - **Colonnine TEM** (13 postazioni)
+  - **Quadri di soccorso VVF** (12 postazioni)
+- 🚨 **Segnalazione Malfunzionamenti**: Camminamento, Corrimano, Segnaletica, Illuminazione
+- 📷 **Foto per Malfunzionamenti**: Con progressiva chilometrica
 - 💾 **Funzionamento Offline Completo**
 - 📧 **Report Dettagliato via Email**
 
-## 🎯 Specifiche Tecniche
+## 🎯 Apprestamenti Tecnologici
 
-### Segnaletica
-Segnaletica che indica le **uscite di emergenza** in galleria
+### Idranti VVF
+Idranti per Vigili del Fuoco posizionati in punti strategici della galleria
 
-### Illuminazione
-Illuminazione di emergenza posta **sopra il corrimano** con distanza di **12,5 metri** tra un corpo illuminante e l'altro
+### Colonnine TEM
+Colonnine di emergenza per comunicazioni tecniche
+
+### Quadri di soccorso VVF
+Quadri elettrici di emergenza per operazioni dei Vigili del Fuoco
 
 ## 🚀 Come Usare
 
@@ -27,122 +32,176 @@ Illuminazione di emergenza posta **sopra il corrimano** con distanza di **12,5 m
 
 All'apertura dell'app ti viene chiesto:
 
-**a) Da quale nicchia vuoi iniziare?**
-- Menu a tendina con tutte le 740 nicchie
-- Esempio: "52+634 - Binario D"
+**a) Da quale apprestamento vuoi iniziare?**
+- Menu a tendina con tutti i 38 apprestamenti tecnologici
+- Esempio: "55+575 - Binario D"
 
 **b) In quale direzione stai andando?**
 - ⬆️ Verso San Benedetto Val di Sambro (55+742)
 - ⬇️ Verso Vernio (37+200)
 
-L'app mostrerà **solo le nicchie nella direzione selezionata** dalla nicchia di partenza.
+L'app mostrerà **solo gli apprestamenti nella direzione selezionata** dal punto di partenza.
 
-### 2. Verifica Ogni Nicchia
+### 2. Verifica Ogni Apprestamento
 
-Per ogni nicchia hai **due sezioni**:
+Per ogni apprestamento tecnologico (Idranti VVF, Colonnine TEM, Quadri di soccorso VVF) hai **tre verifiche obbligatorie**:
 
-#### 🚨 Segnaletica Uscite di Emergenza
-- ✅ **Funzionante** → Tutto OK
-- ⚠️ **Necessita Manutenzione** → Appare pulsante foto
+#### 🔧 Stato dell'apprestamento
+- ✅ **Conforme** → Tutto OK
+- ⚠️ **Non Conforme** → Segnala problema
 
-Se selezioni "Necessita Manutenzione":
-- Appare il pulsante "📷 Scatta Foto Segnaletica"
-- Scatta foto per documentare il problema
+#### 🔒 Verifica manomissione sigillo
+- ✅ **Integro** → Sigillo intatto
+- ⚠️ **Manomesso** → Sigillo manomesso o danneggiato
 
-#### 💡 Illuminazione di Emergenza
-- ✅ **Funzionante** → Tutto OK  
-- ⚠️ **Necessita Manutenzione** → Appare pulsante foto
+#### 🚨 Presenza segnaletica di riferimento
+- ✅ **Presente** → Segnaletica visibile
+- ⚠️ **Assente** → Segnaletica mancante
 
-Se selezioni "Necessita Manutenzione":
-- Appare il pulsante "📷 Scatta Foto Illuminazione"
-- Scatta foto per documentare il problema
+### 3. Segnalazione Malfunzionamenti
 
-### 3. Workflow Completo
+Durante l'ispezione puoi segnalare malfunzionamenti infrastrutturali tramite il pulsante **"🚨 Segnala Malfunzionamento"**.
+
+#### Tipi di Malfunzionamento:
+
+**🚶 Camminamento**
+- Foto obbligatoria
+- Progressiva chilometrica (es. 45+234)
+
+**🤝 Corrimano**
+- Foto obbligatoria
+- Progressiva chilometrica
+
+**🚪 Segnaletica di Uscita**
+- Foto obbligatoria
+- Progressiva chilometrica
+
+**💡 Impianto di Illuminazione**
+- Progressiva chilometrica
+- Tipo di guasto:
+  - **🔵 Fungo Blu** (solo km)
+  - **💡 Corpi Illuminanti** (km + numero corpi non funzionanti)
+
+### 4. Workflow Completo
 
 ```
 INIZIO
 ↓
-1. Seleziona nicchia partenza: "52+634 - Binario D"
+1. Seleziona apprestamento partenza: "55+575 - Binario D"
 2. Seleziona direzione: "Verso San Benedetto"
 3. Premi "Inizia Verifica"
 ↓
-PER OGNI NICCHIA:
+PER OGNI APPRESTAMENTO:
 ↓
-4. Segnaletica:
-   - OK? → Seleziona "Funzionante"
-   - Problema? → Seleziona "Necessita Manutenzione" → Scatta foto
+4. Verifica Stato dell'apprestamento:
+   - OK? → Seleziona "Conforme"
+   - Problema? → Seleziona "Non Conforme"
 ↓
-5. Illuminazione:
-   - OK? → Seleziona "Funzionante"
-   - Problema? → Seleziona "Necessita Manutenzione" → Scatta foto
+5. Verifica Sigillo:
+   - OK? → Seleziona "Integro"
+   - Problema? → Seleziona "Manomesso"
 ↓
-6. Nicchia completata automaticamente ✓
+6. Verifica Segnaletica:
+   - OK? → Seleziona "Presente"
+   - Problema? → Seleziona "Assente"
 ↓
-PROSSIMA NICCHIA...
+7. Apprestamento completato automaticamente ✓
+↓
+8. (Opzionale) Segnala malfunzionamenti:
+   - Camminamento/Corrimano/Segnaletica → Foto + KM
+   - Illuminazione → Tipo guasto + KM (+ numero corpi se necessario)
+↓
+PROSSIMO APPRESTAMENTO...
 ↓
 FINE
-7. Inserisci email
-8. Invia Report
+9. Invia Report via Email
 ```
 
 ## 📊 Esempio Report
 
 ```
-REPORT VERIFICA NICCHIE DI SICUREZZA GALLERIA
-Data Ispezione: 11/02/2025 15:30
+REPORT VERIFICA APPRESTAMENTI TECNOLOGICI GALLERIA
+Data Ispezione: 13/02/2026 15:30
 Direzione: Verso San Benedetto Val di Sambro (55+742)
-Nicchie Verificate: 180/180
-Nicchie Necessitano Manutenzione: 12
+Apprestamenti Verificati: 13/13
+Apprestamenti Non Conformi: 2
+Segnalazioni Malfunzionamenti: 3
 Percentuale Completamento: 100%
 
 ============================================================
 
-RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE
+RIEPILOGO APPRESTAMENTI NON CONFORMI
 
-📍 52+634 - Binario D
-   ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione (2 foto)
-   Verificato: 11/02/2025 14:30
+📍 54+774 - Binario D - Idranti VVF
+   ⚠️ STATO APPRESTAMENTO - Non Conforme
+   ⚠️ SIGILLO - Manomesso
+   Verificato: 13/02/2026 14:30
 
-📍 48+424 - Binario P
-   ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione (1 foto)
-   Verificato: 11/02/2025 15:15
+📍 46+597 - Binario P - Quadri di soccorso VVF
+   ⚠️ SEGNALETICA DI RIFERIMENTO - Assente
+   Verificato: 13/02/2026 15:15
 
 ============================================================
 
-DETTAGLIO COMPLETO NICCHIE
+SEGNALAZIONI MALFUNZIONAMENTI
 
-1. Km 52+634 - Binario D
-   Stato: ✅ VERIFICATA
-   Segnaletica Uscite Emergenza: ⚠️ Necessita Manutenzione
-   Illuminazione Emergenza (12,5m): ✅ Funzionante
-   Data Verifica: 11/02/2025 14:30
-   Foto Allegate: 2
-     - Segnaletica: 2
+1. 🚶 CAMMINAMENTO
+   Progressiva: 48+150
+   Foto Allegata: Sì
+   Segnalato: 13/02/2026 14:45
 
-2. Km 52+621 - Binario D
-   Stato: ✅ VERIFICATA
-   Segnaletica Uscite Emergenza: ✅ Funzionante
-   Illuminazione Emergenza (12,5m): ✅ Funzionante
-   Data Verifica: 11/02/2025 14:35
+2. 💡 IMPIANTO DI ILLUMINAZIONE
+   Progressiva: 50+234
+   Tipo Guasto: Corpi Illuminanti
+   Numero Corpi Non Funzionanti: 5
+   Segnalato: 13/02/2026 15:00
+
+3. 🤝 CORRIMANO
+   Progressiva: 52+100
+   Foto Allegata: Sì
+   Note: Corrimano danneggiato, necessita sostituzione
+   Segnalato: 13/02/2026 15:20
+
+============================================================
+
+DETTAGLIO COMPLETO APPRESTAMENTI TECNOLOGICI
+
+1. Km 55+575 - Binario D
+   Tipo: Idranti VVF
+   Stato: ✅ VERIFICATO
+   Stato Apprestamento: ✅ Conforme
+   Sigillo: ✅ Integro
+   Segnaletica di Riferimento: ✅ Presente
+   Data Verifica: 13/02/2026 14:00
+
+2. Km 54+774 - Binario D
+   Tipo: Idranti VVF
+   Stato: ✅ VERIFICATO
+   Stato Apprestamento: ⚠️ Non Conforme
+   Sigillo: ⚠️ Manomesso
+   Segnaletica di Riferimento: ✅ Presente
+   Data Verifica: 13/02/2026 14:30
 
 ...
 
 Note Tecniche:
-- Segnaletica: Indica le uscite di emergenza in galleria
-- Illuminazione: Corpi illuminanti sopra corrimano a distanza 12,5m
+- Apprestamenti Tecnologici: Idranti VVF, Colonnine TEM, Quadri di soccorso VVF
+- Per ogni apprestamento: verificato stato, sigillo e segnaletica
+- Segnalati 3 malfunzionamenti infrastrutturali
 ```
 
 ## ✨ Caratteristiche Avanzate
 
 ### Filtro Automatico
-L'app mostra solo le nicchie rilevanti:
+L'app mostra solo gli apprestamenti rilevanti:
 - Se parti da km 50+000 verso San Benedetto: mostra da 50+000 a 55+742
 - Se parti da km 50+000 verso Vernio: mostra da 50+000 a 37+259
 
-### Foto Intelligenti
-- **NO foto** se tutto funzionante
-- **Foto richiesta** solo se necessita manutenzione
-- Foto categorizzate automaticamente (segnaletica/illuminazione)
+### Gestione Malfunzionamenti
+- **Segnalazioni separate** dalle verifiche apprestamenti
+- **Foto obbligatorie** per Camminamento, Corrimano, Segnaletica uscita
+- **Progressiva chilometrica** per tutti i malfunzionamenti
+- **Dettagli specifici** per illuminazione (tipo guasto + numero corpi)
 
 ### Salvataggio Automatico
 - Ogni selezione salvata istantaneamente
