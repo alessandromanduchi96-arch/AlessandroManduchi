@@ -1,6 +1,6 @@
 {
-  "name": "Monitoring impianti galleria",
-  "short_name": "Monitoring",
+  "name": "Monitoraggio Galleria",
+  "short_name": "Monitoraggio",
   "description": "Verifica apprestamenti tecnologici in gallerie ferroviarie con report offline",
   "start_url": "/",
   "display": "standalone",

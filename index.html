@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#FFF8F0">
-    <title>Monitoring impianti galleria</title>
+    <title>Monitoraggio Galleria</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Monitoring impianti galleria">
+    <meta name="apple-mobile-web-app-title" content="Monitoraggio Galleria">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         :root {
@@ -576,7 +579,7 @@
         <!-- Start Screen -->
         <div id="startScreen" class="card" style="display: block;">
             <header class="header">
-                <h1 class="logo">Monitoring impianti galleria</h1>
+                <h1 class="logo">Monitoraggio Galleria</h1>
                 <p class="tagline">Verifica Apprestamenti Tecnologici Galleria Ferroviaria</p>
             </header>
             
@@ -614,7 +617,7 @@
         <!-- Main Screen -->
         <div id="mainScreen" style="display: none;">
         <header class="header">
-            <h1 class="logo">Monitoring impianti galleria</h1>
+            <h1 class="logo">Monitoraggio Galleria</h1>
             <p class="tagline">Verifica Apprestamenti Tecnologici Galleria Ferroviaria</p>
         </header>
         
@@ -2306,6 +2309,206 @@ function updatePaginationUI() {
             }
         }
 
+        // Generate PDF report with photos
+        async function generatePDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 15;
+            const lineHeight = 7;
+            
+            // Helper function to check if we need a new page
+            function checkNewPage(needed = 10) {
+                if (yPosition + needed > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = 20;
+                    return true;
+                }
+                return false;
+            }
+            
+            // Title
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('REPORT VERIFICA APPRESTAMENTI', margin, yPosition);
+            yPosition += 10;
+            doc.setFontSize(16);
+            doc.text('TECNOLOGICI GALLERIA', margin, yPosition);
+            yPosition += 12;
+            
+            // Date and direction
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Data Ispezione: ${new Date().toLocaleString('it-IT')}`, margin, yPosition);
+            yPosition += lineHeight;
+            
+            const directionText = selectedDirection === 'san_benedetto' 
+                ? 'San Benedetto Val di Sambro (55+742)' 
+                : 'Vernio (37+200)';
+            doc.text(`Direzione: Verso ${directionText}`, margin, yPosition);
+            yPosition += lineHeight + 3;
+            
+            // Statistics
+            const totalNiches = checklistData.length;
+            const completedNiches = checklistData.filter(i => i.completed).length;
+            const nonConformNiches = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
+            }).length;
+            
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('RIEPILOGO:', margin, yPosition);
+            yPosition += lineHeight;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Apprestamenti Verificati: ${completedNiches}/${totalNiches}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Apprestamenti Non Conformi: ${nonConformNiches}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Segnalazioni Malfunzionamenti: ${malfunctionReports.length}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Percentuale Completamento: ${Math.round((completedNiches/totalNiches)*100)}%`, margin + 5, yPosition);
+            yPosition += 10;
+            
+            // Non-conforming niches
+            const nichesNonConform = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
+            });
+            
+            if (nichesNonConform.length > 0) {
+                checkNewPage(20);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('APPRESTAMENTI NON CONFORMI', margin, yPosition);
+                yPosition += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                
+                nichesNonConform.forEach((item) => {
+                    checkNewPage(25);
+                    const niche = filteredNiches.find(n => n.id === item.id);
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${niche.km} - Binario ${niche.binario}`, margin, yPosition);
+                    yPosition += lineHeight;
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`${niche.description}`, margin + 5, yPosition);
+                    yPosition += lineHeight;
+                    
+                    if (item.checks.statoApprestamento === 'non_conforme') {
+                        doc.text(`[!] STATO APPRESTAMENTO - Non Conforme`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    if (item.checks.sigillo === 'manomesso') {
+                        doc.text(`[!] SIGILLO - Manomesso`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    if (item.checks.segnaletica === 'assente') {
+                        doc.text(`[!] SEGNALETICA - Assente`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    yPosition += 5;
+                });
+                
+                yPosition += 5;
+            }
+            
+            // Malfunction reports with photos
+            if (malfunctionReports.length > 0) {
+                checkNewPage(20);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('SEGNALAZIONI MALFUNZIONAMENTI', margin, yPosition);
+                yPosition += 10;
+                
+                doc.setFontSize(10);
+                
+                for (let i = 0; i < malfunctionReports.length; i++) {
+                    const malfunction = malfunctionReports[i];
+                    checkNewPage(70);
+                    
+                    doc.setFont(undefined, 'bold');
+                    const typeLabels = {
+                        'camminamento': 'CAMMINAMENTO',
+                        'corrimano': 'CORRIMANO',
+                        'segnaletica_uscita': 'SEGNALETICA DI USCITA',
+                        'illuminazione': 'IMPIANTO DI ILLUMINAZIONE'
+                    };
+                    doc.text(`${i + 1}. ${typeLabels[malfunction.type]}`, margin, yPosition);
+                    yPosition += lineHeight;
+                    
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Progressiva: ${malfunction.kmMarker}`, margin + 5, yPosition);
+                    yPosition += lineHeight;
+                    
+                    if (malfunction.type === 'illuminazione') {
+                        const lightingLabels = {
+                            'fungo_blu': 'Fungo Blu',
+                            'corpi_illuminanti': 'Corpi Illuminanti'
+                        };
+                        doc.text(`Tipo Guasto: ${lightingLabels[malfunction.lightingType]}`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                        
+                        if (malfunction.lightingType === 'corpi_illuminanti' && malfunction.bodyCount) {
+                            doc.text(`Numero Corpi Non Funzionanti: ${malfunction.bodyCount}`, margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        }
+                    }
+                    
+                    if (malfunction.notes) {
+                        const notesLines = doc.splitTextToSize(`Note: ${malfunction.notes}`, pageWidth - margin * 2 - 10);
+                        notesLines.forEach(line => {
+                            checkNewPage();
+                            doc.text(line, margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        });
+                    }
+                    
+                    if (malfunction.timestamp) {
+                        doc.text(`Segnalato: ${new Date(malfunction.timestamp).toLocaleString('it-IT')}`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    // Add photo if available
+                    if (malfunction.photo) {
+                        checkNewPage(80);
+                        yPosition += 3;
+                        try {
+                            // Add photo to PDF
+                            const imgWidth = pageWidth - margin * 2;
+                            const imgHeight = 60;
+                            doc.addImage(malfunction.photo, 'JPEG', margin, yPosition, imgWidth, imgHeight);
+                            yPosition += imgHeight + 5;
+                        } catch (e) {
+                            doc.text('[Errore nel caricamento della foto]', margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        }
+                    }
+                    
+                    yPosition += 5;
+                }
+            }
+            
+            // Footer
+            checkNewPage(15);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'italic');
+            doc.text(`Generato da Monitoraggio Galleria - ${new Date().toLocaleString('it-IT')}`, margin, yPosition);
+            
+            return doc;
+        }
+
         // Submit report
         async function submitReport() {
             if (!isOnline) {
@@ -2319,28 +2522,53 @@ function updatePaginationUI() {
                 return;
             }
             
+            // Generate text report
             const report = generateReport();
             
-            // In a real implementation, you would send this to a backend API
-            // For this demo, we'll use mailto: as a fallback
-            const subject = encodeURIComponent(`Report Checklist - ${new Date().toLocaleDateString('it-IT')}`);
-            const body = encodeURIComponent(report);
+            // Generate PDF
+            showToast('Generazione PDF in corso...', 'info');
             
-            // Show success message
-            showToast('Report generato! Apertura client email...', 'success');
-            
-            // Open mailto
-            setTimeout(() => {
-                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-            }, 1000);
-            
-            // Clear data after successful submission
-            setTimeout(() => {
-                if (confirm('Report inviato! Vuoi cancellare i dati locali?')) {
-                    localStorage.removeItem('checklistData');
-                    location.reload();
-                }
-            }, 2000);
+            try {
+                const pdfDoc = await generatePDFReport();
+                
+                // Generate filename with date
+                const dateStr = new Date().toISOString().split('T')[0];
+                const filename = `Report_Galleria_${dateStr}.pdf`;
+                
+                // Save PDF file
+                pdfDoc.save(filename);
+                
+                // Show success message with instructions
+                showToast('PDF generato e scaricato! Allega il file alla email.', 'success');
+                
+                // Open mailto with text report in body
+                const subject = encodeURIComponent(`Report Verifica Galleria - ${new Date().toLocaleDateString('it-IT')}`);
+                const body = encodeURIComponent(`${report}\n\n[Si prega di allegare il file PDF scaricato]`);
+                
+                setTimeout(() => {
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }, 1500);
+                
+                // Clear data after successful submission
+                setTimeout(() => {
+                    if (confirm('Report generato! Vuoi cancellare i dati locali e ricominciare?')) {
+                        localStorage.removeItem('checklistData');
+                        localStorage.removeItem('malfunctionReports');
+                        location.reload();
+                    }
+                }, 3000);
+            } catch (error) {
+                console.error('Errore generazione PDF:', error);
+                showToast('Errore nella generazione del PDF. Invio solo report testuale.', 'error');
+                
+                // Fallback to text-only email
+                const subject = encodeURIComponent(`Report Verifica Galleria - ${new Date().toLocaleDateString('it-IT')}`);
+                const body = encodeURIComponent(report);
+                
+                setTimeout(() => {
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }, 1000);
+            }
         }
 
         // Generate report
@@ -2488,7 +2716,7 @@ function updatePaginationUI() {
                 report += `- Segnalati ${malfunctionReports.length} malfunzionamenti infrastrutturali\n`;
             }
             report += '\nFine Report\n';
-            report += `Generato da Monitoring impianti galleria - ${new Date().toLocaleString('it-IT')}\n`;
+            report += `Generato da Monitoraggio Galleria - ${new Date().toLocaleString('it-IT')}\n`;
             
             return report;
         }
