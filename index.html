@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
-    <title>NicheSafe - Verifica Nicchie Galleria</title>
+    <meta name="theme-color" content="#FFF8F0">
+    <title>Monitoraggio Galleria</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="NicheSafe">
+    <meta name="apple-mobile-web-app-title" content="Monitoraggio Galleria">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --bg-hover: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --accent: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --border: #334155;
+            --primary: #2c5f8d;
+            --primary-dark: #1a4060;
+            --bg-dark: #FFF8F0;
+            --bg-card: #FFFFFF;
+            --bg-hover: #F5EDE3;
+            --text-primary: #2C3E50;
+            --text-secondary: #5D6D7E;
+            --accent: #5DADE2;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --border: #D5DBDB;
         }
         
         * {
@@ -39,7 +42,7 @@
         }
         
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Lato', sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
@@ -47,7 +50,7 @@
             position: relative;
         }
         
-        /* Animated background */
+        /* Subtle background */
         body::before {
             content: '';
             position: fixed;
@@ -56,8 +59,8 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(93, 173, 226, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(243, 156, 18, 0.02) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
@@ -78,15 +81,12 @@
         }
         
         .logo {
-            font-family: 'Syne', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
             margin-bottom: 0.5rem;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.01em;
         }
         
         .tagline {
@@ -579,12 +579,11 @@
         <!-- Start Screen -->
         <div id="startScreen" class="card" style="display: block;">
             <header class="header">
-                <h1 class="logo">📍 NicheSafe</h1>
-                <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
+                <h1 class="logo">Monitoraggio Galleria</h1>
+                <p class="tagline">Verifica Apprestamenti Tecnologici Galleria Ferroviaria</p>
             </header>
             
             <h2 class="section-title" style="margin-top: 2rem;">
-                <span class="section-icon">🚀</span>
                 Inizia Verifica
             </h2>
             
@@ -603,14 +602,13 @@
                 </label>
                 <select id="direction" class="email-input" style="cursor: pointer;">
                     <option value="">-- Seleziona direzione --</option>
-                    <option value="san_benedetto">⬆️ Verso San Benedetto Val di Sambro (55+742)</option>
-                    <option value="vernio">⬇️ Verso Vernio (37+200)</option>
+                    <option value="san_benedetto">Verso San Benedetto Val di Sambro (55+742)</option>
+                    <option value="vernio">Verso Vernio (37+200)</option>
                 </select>
             </div>
             
             <div style="text-align: center;">
                 <button class="btn btn-primary" id="startBtn" disabled>
-                    <span>▶️</span>
                     <span>Inizia Verifica</span>
                 </button>
             </div>
@@ -619,8 +617,8 @@
         <!-- Main Screen -->
         <div id="mainScreen" style="display: none;">
         <header class="header">
-            <h1 class="logo">📍 NicheSafe</h1>
-            <p class="tagline">Verifica Nicchie di Sicurezza Galleria Ferroviaria</p>
+            <h1 class="logo">Monitoraggio Galleria</h1>
+            <p class="tagline">Verifica Apprestamenti Tecnologici Galleria Ferroviaria</p>
         </header>
         
         <div class="status-bar">
@@ -629,15 +627,13 @@
                 <span id="statusText">Controllo connessione...</span>
             </div>
             <div class="status-badge">
-                <span>📋</span>
                 <span id="directionInfo">Direzione non impostata</span>
             </div>
         </div>
         
         <div class="card">
             <h2 class="section-title">
-                <span class="section-icon">🚇</span>
-                Nicchie da Verificare
+                Apprestamenti da Verificare
             </h2>
             
             <div class="checklist" id="checklist">
@@ -646,7 +642,7 @@
 
  <div id="paginationControls" style="margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
   <button class="btn btn-secondary" id="loadMoreBtn" type="button" style="min-width: 220px; justify-content: center;">
-    ➕ Mostra altre 10
+    Mostra altre 10
   </button>
   <div id="shownCount" style="color: var(--text-secondary); font-size: 0.9rem;">
     Mostrate 0/0
@@ -666,11 +662,10 @@
             
             <div class="submit-section">
   <div style="margin-bottom: 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">
-    📩 Destinatario report: <b id="fixedRecipient">a.manduchi@rfi.it</b>
+    Destinatario report: <b id="fixedRecipient">a.manduchi@rfi.it</b>
   </div>
   <input type="email" class="email-input hidden" id="emailInput" value="a.manduchi@rfi.it">
   <button class="btn btn-primary" id="submitBtn">
-                    <span>📧</span>
                     <span>Invia Report via Email</span>
                 </button>
 </div>
@@ -678,10 +673,114 @@
         </div> <!-- end mainScreen -->
     </div> <!-- end container -->
     
+    <!-- Fixed Floating Malfunction Button -->
+    <button id="floatingMalfunctionBtn" onclick="openMalfunctionModal()" 
+            onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 16px rgba(0, 0, 0, 0.4)'; document.getElementById('btnTooltip').style.opacity='1'" 
+            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.3)'; document.getElementById('btnTooltip').style.opacity='0'"
+            style="display: none; position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--danger); color: white; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); cursor: pointer; z-index: 999; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s; font-weight: bold;">
+        !
+        <div style="position: absolute; bottom: 70px; right: 0; background: var(--bg-card); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 0.5rem; white-space: nowrap; font-size: 0.875rem; font-weight: normal; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); opacity: 0; pointer-events: none; transition: opacity 0.3s;" id="btnTooltip">
+            Segnala Malfunzionamento
+        </div>
+    </button>
+    
+    <!-- Malfunction Modal -->
+    <div id="malfunctionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; overflow-y: auto; padding: 1rem;">
+        <div style="max-width: 600px; margin: 2rem auto; background: var(--bg-card); border-radius: 1.5rem; padding: 2rem; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-family: 'Syne', sans-serif; font-size: 1.5rem; margin: 0;">Segnala Malfunzionamento</h2>
+                <button onclick="closeMalfunctionModal()" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; transition: background 0.3s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='none'">✕</button>
+            </div>
+            
+            <!-- Tipo di malfunzionamento -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Tipo di Malfunzionamento</label>
+                <div style="display: grid; gap: 0.75rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="camminamento" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">Camminamento</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="corrimano" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">Corrimano</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="segnaletica_uscita" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">Segnaletica di Uscita</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Foto obbligatoria + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 2px solid transparent; cursor: pointer; transition: all 0.3s;" class="malfunction-type-label">
+                        <input type="radio" name="malfunctionType" value="illuminazione" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleMalfunctionTypeChange()">
+                        <div>
+                            <div style="font-weight: 600;">Impianto di Illuminazione</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">Specifica tipo guasto + progressiva chilometrica</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Lighting specific fields (conditional) -->
+            <div id="lightingFields" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Tipo di Guasto Illuminazione</label>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="lightingType" value="fungo_blu" style="width: 20px; height: 20px; cursor: pointer;">
+                        <span>Fungo Blu</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="radio" name="lightingType" value="corpi_illuminanti" style="width: 20px; height: 20px; cursor: pointer;" onchange="handleLightingTypeChange()">
+                        <span>Corpi Illuminanti</span>
+                    </label>
+                </div>
+                <div id="lightingBodyCount" style="display: none;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">Numero di corpi non funzionanti</label>
+                    <input type="number" id="bodyCount" min="1" style="width: 100%; padding: 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem;">
+                </div>
+            </div>
+            
+            <!-- Progressiva chilometrica (always shown when type selected) -->
+            <div id="kmFields" style="display: none; margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">Progressiva Chilometrica *</label>
+                <input type="text" id="kmMarker" placeholder="es. 45+234" style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem;">
+            </div>
+            
+            <!-- Photo capture (conditional - not for lighting) -->
+            <div id="photoFields" style="display: none; margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">Foto del Malfunzionamento *</label>
+                <button onclick="captureMalfunctionPhoto()" class="btn btn-secondary" style="width: 100%; justify-content: center;">
+                    Scatta Foto
+                </button>
+                <div id="malfunctionPhotoPreview" style="margin-top: 0.75rem;"></div>
+            </div>
+            
+            <!-- Note aggiuntive -->
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">Note Aggiuntive (opzionale)</label>
+                <textarea id="malfunctionNotes" rows="3" placeholder="Descrivi eventuali dettagli aggiuntivi..." style="width: 100%; padding: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); font-size: 1rem; resize: vertical; font-family: inherit;"></textarea>
+            </div>
+            
+            <!-- Actions -->
+            <div style="display: flex; gap: 0.75rem;">
+                <button onclick="closeMalfunctionModal()" class="btn btn-secondary" style="flex: 1;">Annulla</button>
+                <button onclick="saveMalfunctionReport()" class="btn btn-primary" style="flex: 1;">Salva Segnalazione</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="toast" id="toast"></div>
     
     <!-- Hidden file input for camera -->
     <input type="file" accept="image/*" capture="environment" class="hidden" id="cameraInput">
+    <!-- Hidden file input for malfunction photos -->
+    <input type="file" accept="image/*" capture="environment" class="hidden" id="malfunctionCameraInput">
 
     <script>
         // Configuration - Railway Niches Data
@@ -1427,59 +1526,99 @@
 37+259 P`;
 
         // Parse niches data
- // Elenco nicchie con verifica aggiuntiva VV.F. (manichette + segnaletica)
- const VVF_SPECIAL_SET = new Set([
-  '55+575 D',
-  '55+425 D',
-  '55+275 D',
-  '55+175 D',
-  '55+024 D',
-  '54+874 D',
-  '54+774 D',
-  '54+674 D',
-  '54+574 D',
-  '54+424 D',
-  '54+324 D',
-  '54+174 D',
-  '54+024 D',
-  '53+773 D',
-  '53+623 D',
-  '53+473 D',
-  '53+373 D',
-  '53+223 D',
-  '53+073 D',
-  '47+724 P',
-  '47+649 P',
-  '47+524 P',
-  '47+273 P',
-  '47+173 P',
-  '47+025 P',
-  '46+697 P',
-  '46+597 P',
-  '46+447 P',
-  '46+208 P',
-  '46+058 P',
-  '45+908 P',
-  '45+758 P',
-  '45+658 P',
-  '45+508 P',
-  '45+408 P',
-  '45+308 P',
-  '45+158 P',
-  '45+058 P'
-]);
+ // Nicchie con apprestamenti tecnologici
+ // Solo queste nicchie devono essere verificate
+ const TECHNOLOGICAL_FACILITIES = {
+  // Idranti VVF (VVF Hydrants)
+  'idranti_vvf': new Set([
+   // Binario D
+   '55+575 D', '55+425 D', '55+275 D', '55+175 D', '55+024 D', '54+874 D', '54+774 D', 
+   '54+674 D', '54+574 D', '54+424 D', '54+324 D', '54+174 D', '54+024 D', '53+773 D', 
+   '53+623 D', '53+473 D', '53+373 D', '53+223 D', '53+073 D', '52+921 D', '52+771 D', 
+   '52+671 D', '52+521 D', '52+371 D', '52+221 D', '52+121 D', '51+969 D', '51+869 D', 
+   '51+719 D', '51+619 D', '51+469 D', '51+319 D', '51+169 D', '51+019 D', '50+871 D', 
+   '50+721 D', '50+572 D', '50+472 D', '50+322 D', '50+223 D', '50+073 D', '49+973 D', 
+   '49+824 D', '49+674 D', '49+524 D', '49+374 D', '49+224 D', '49+074 D', '48+924 D', 
+   '48+824 D', '48+674 D', '48+574 D', '48+524 D', '48+424 D', '48+324 D', '48+224 D', 
+   '48+074 D', '47+924 D', '47+824 D',
+   // Binario P
+   '47+724 P', '47+649 P', '47+524 P', '47+273 P', '47+173 P', '47+025 P', '46+697 P', 
+   '46+597 P', '46+447 P', '46+208 P', '46+058 P', '45+908 P', '45+758 P', '45+658 P', 
+   '45+508 P', '45+408 P', '45+308 P', '45+158 P', '45+058 P'
+  ]),
+  // Colonnine TEM (TEM Columns)
+  'colonnine_tem': new Set([
+   // Binario D
+   '55+475 D', '55+024 D', '54+524 D', '54+024 D', '53+523 D', '53+023 D', '52+521 D', 
+   '52+471 D', '51+469 D', '51+419 D', '50+622 D', '50+572 D', '49+674 D', '49+624 D', 
+   '49+574 D', '48+074 D', '47+574 D', '47+050 D', '46+431 D', '45+786 D', '45+283 D', 
+   '45+033 D', '44+533 D', '44+038 D', '43+488 D', '42+988 D', '42+538 D', '42+038 D', 
+   '41+786 D', '41+333 D', '40+832 D', '40+338 D', '40+088 D', '39+538 D', '39+038 D', 
+   '38+588 D', '38+038 D', '37+538 D',
+   // Binario P
+   '55+742 P', '55+400 P', '55+150 P', '54+899 P', '54+599 P', '54+349 P', '54+099 P', 
+   '53+847 P', '53+597 P', '53+347 P', '53+097 P', '52+846 P', '52+646 P', '52+396 P', 
+   '52+146 P', '51+894 P', '51+644 P', '51+394 P', '51+144 P', '50+845 P', '50+647 P', 
+   '50+397 P', '50+098 P', '49+849 P', '49+549 P', '49+349 P', '49+099 P', '48+849 P', 
+   '48+649 P', '48+449 P', '48+249 P', '47+799 P', '47+649 P', '47+499 P', '47+223 P', 
+   '46+855 P', '46+800 P', '46+497 P', '46+232 P', '45+958 P', '45+708 P', '45+458 P', 
+   '45+258 P', '44+958 P', '44+708 P', '44+458 P', '44+219 P', '44+019 P', '43+813 P', 
+   '43+563 P', '43+313 P', '43+088 P', '42+813 P', '42+563 P', '42+313 P', '42+063 P', 
+   '41+757 P', '41+513 P', '41+259 P', '41+013 P', '40+763 P', '40+513 P', '40+263 P', 
+   '40+013 P', '39+763 P', '39+563 P', '39+313 P', '39+113 P', '38+863 P', '38+663 P', 
+   '38+413 P', '38+163 P', '37+913 P', '37+663 P', '37+413 P', '37+259 P'
+  ]),
+  // Quadri di soccorso VVF (VVF Emergency Panels)
+  'quadri_soccorso_vvf': new Set([
+   // Solo Binario D
+   '55+742 D', '55+400 D', '55+150 D', '54+899 D', '54+599 D', '54+349 D', '54+099 D', 
+   '53+847 D', '53+597 D', '53+347 D', '53+097 D', '52+846 D', '52+646 D', '52+396 D', 
+   '52+146 D', '51+894 D', '51+644 D', '51+394 D', '51+144 D', '50+845 D', '50+647 D', 
+   '50+397 D', '50+098 D', '49+849 D', '49+549 D', '49+349 D', '49+099 D', '48+849 D', 
+   '48+649 D', '48+449 D', '48+249 D', '47+799 D', '47+649 D', '47+499 D', '47+223 D', 
+   '46+855 D', '46+800 D', '46+497 D', '46+232 D', '45+958 D', '45+708 D', '45+458 D', 
+   '45+258 D', '44+958 D', '44+708 D', '44+458 D', '44+219 D', '44+019 D', '43+813 D', 
+   '43+563 D', '43+313 D', '43+088 D', '42+813 D', '42+563 D', '42+313 D', '42+063 D', 
+   '41+757 D', '41+513 D', '41+259 D', '41+013 D', '40+763 D', '40+513 D', '40+263 D', 
+   '40+013 D', '39+763 D', '39+563 D', '39+313 D', '39+113 D', '38+863 D', '38+663 D', 
+   '38+413 D', '38+163 D', '37+913 D', '37+663 D', '37+413 D', '37+259 D'
+  ])
+ };
+
+ // Helper function to get facility type for a niche
+ function getFacilityType(km, binario) {
+  const key = `${km} ${binario}`;
+  if (TECHNOLOGICAL_FACILITIES.idranti_vvf.has(key)) return 'idranti_vvf';
+  if (TECHNOLOGICAL_FACILITIES.colonnine_tem.has(key)) return 'colonnine_tem';
+  if (TECHNOLOGICAL_FACILITIES.quadri_soccorso_vvf.has(key)) return 'quadri_soccorso_vvf';
+  return null;
+ }
+
+ // Helper function to get facility label
+ function getFacilityLabel(facilityType) {
+  const labels = {
+   'idranti_vvf': 'Idranti VVF',
+   'colonnine_tem': 'Colonnine TEM',
+   'quadri_soccorso_vvf': 'Quadri di soccorso VVF'
+  };
+  return labels[facilityType] || '';
+ }
 
         const CHECKLIST_ITEMS = NICHES_RAW_DATA.split('\n')
             .map((line, index) => {
                 const parts = line.trim().split(' ');
                 if (parts.length === 2) {
+                    const facilityType = getFacilityType(parts[0], parts[1]);
+                    // Solo nicchie con apprestamenti tecnologici
+                    if (!facilityType) return null;
+                    
                     return {
                         id: index + 1,
                         km: parts[0],
                         binario: parts[1],
                         title: `Nicchia km ${parts[0]} - Binario ${parts[1]}`,
-                        description: `Verifica Segnaletica e Illuminazione`,
-      isVvfSpecial: VVF_SPECIAL_SET.has(`${parts[0]} ${parts[1]}`)
+                        description: `${getFacilityLabel(facilityType)}`,
+                        facilityType: facilityType
                     };
                 }
                 return null;
@@ -1488,6 +1627,7 @@
 
         // State
         let checklistData = [];
+        let malfunctionReports = []; // Array per segnalazioni malfunzionamenti
         let isOnline = navigator.onLine;
         let selectedDirection = null;
         let startNicheId = null;
@@ -1549,13 +1689,14 @@
                 
                 // Update direction info
                 const dirText = selectedDirection === 'san_benedetto' 
-                    ? '⬆️ Verso San Benedetto' 
-                    : '⬇️ Verso Vernio';
+                    ? 'Verso San Benedetto' 
+                    : 'Verso Vernio';
                 document.getElementById('directionInfo').textContent = dirText;
                 
                 // Show main screen
                 document.getElementById('startScreen').style.display = 'none';
                 document.getElementById('mainScreen').style.display = 'block';
+                document.getElementById('floatingMalfunctionBtn').style.display = 'flex';
                 
                 showToast('Verifica iniziata!', 'success');
             });
@@ -1602,22 +1743,14 @@
                     binario: item.binario,
                     title: item.title,
                     description: item.description,
+                    facilityType: item.facilityType,
                     completed: false,
                     checks: {
-                        segnaletica: null,
-                        illuminazione: null
+                        statoApprestamento: null, // Stato dell'apprestamento
+                        sigillo: null, // Verifica manomissione sigillo
+                        segnaletica: null // Presenza segnaletica di riferimento
                     },
                     timestamp: null,
-                    photos: [], // Backward compatibility
-                    photosByType: {
-                        segnaletica: [],
-                        illuminazione: [],
-                        general: []
-                    },
-                    needsPhoto: {
-                        segnaletica: false,
-                        illuminazione: false
-                    },
                     notes: ''
                 };
                 
@@ -1642,100 +1775,82 @@
                 <div class="check-header">
                     <div class="check-content">
                         <div class="check-title">${item.title}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                            <span style="font-weight: 600; color: var(--warning);">${item.description}</span>
+                        </div>
                         
-                        <!-- Segnaletica Section -->
+                        <!-- Stato dell'apprestamento -->
                         <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>🚨</span>
-                                <span>Segnaletica Uscite di Emergenza</span>
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Stato dell'apprestamento
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                Verifica presenza e visibilità della segnaletica di emergenza che indica le uscite di sicurezza
+                                Verifica lo stato generale dell'apprestamento tecnologico
                             </div>
                             
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="funzionante" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="statoApprestamento-${item.id}" value="conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Funzionante</span>
+                                    <span style="font-weight: 500;">Conforme</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="segnaletica-${item.id}" value="manutenzione" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                    <input type="radio" name="statoApprestamento-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="statoApprestamento"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Necessita Manutenzione</span>
+                                    <span style="font-weight: 500;">Non Conforme</span>
                                 </label>
-                            </div>
-                            
-                            <div id="photo-btn-seg-${item.id}" style="margin-top: 1rem; display: none;">
-                                <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'segnaletica')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Segnaletica
-                                </button>
                             </div>
                         </div>
                         
-                        <!-- Illuminazione Section -->
+                        <!-- Verifica manomissione sigillo -->
                         <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-                            <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span>💡</span>
-                                <span>Illuminazione di Emergenza</span>
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Verifica manomissione sigillo
                             </div>
                             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                                Verifica illuminazione sopra il corrimano (distanza 12,5m tra corpi illuminanti)
+                                Controlla se il sigillo è integro e non è stato manomesso
                             </div>
                             
                             <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="illuminazione-${item.id}" value="funzionante" class="safety-radio" data-id="${item.id}" data-type="illuminazione"
+                                    <input type="radio" name="sigillo-${item.id}" value="integro" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">✅ Funzionante</span>
+                                    <span style="font-weight: 500;">Integro</span>
                                 </label>
                                 
                                 <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-                                    <input type="radio" name="illuminazione-${item.id}" value="manutenzione" class="safety-radio" data-id="${item.id}" data-type="illuminazione"
+                                    <input type="radio" name="sigillo-${item.id}" value="manomesso" class="safety-radio" data-id="${item.id}" data-type="sigillo"
                                            style="width: 20px; height: 20px; cursor: pointer;">
-                                    <span style="font-weight: 500;">⚠️ Necessita Manutenzione</span>
+                                    <span style="font-weight: 500;">Manomesso</span>
                                 </label>
-                            </div>
-                            
-                            <div id="photo-btn-ill-${item.id}" style="margin-top: 1rem; display: none;">
-                                <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'illuminazione')" style="width: 100%; justify-content: center;">
-                                    📷 Scatta Foto Illuminazione
-                                </button>
                             </div>
                         </div>
                         
-                        ${item.isVvfSpecial ? `
- <!-- VVF Section (solo nicchie selezionate) -->
- <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
-  <div style="display:flex; justify-content: space-between; align-items:center; gap: 0.75rem;">
-   <div style="font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-    <span>🔥</span>
-    <span>Antincendio VV.F. (Manichette + Segnaletica)</span>
-   </div>
-   <span class="vvf-badge">Check extra</span>
-  </div>
-  <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-   Verifica la presenza delle <b>manichette per i Vigili del Fuoco</b> e della <b>segnaletica di riferimento</b> (presente, visibile e conforme).
-  </div>
-  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-   <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-    <input type="radio" name="vvf-${item.id}" value="presente" class="safety-radio" data-id="${item.id}" data-type="vvf" style="width: 20px; height: 20px; cursor: pointer;">
-    <span style="font-weight: 500;">✅ Presente e segnaletica OK</span>
-   </label>
-   <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
-    <input type="radio" name="vvf-${item.id}" value="non_conforme" class="safety-radio" data-id="${item.id}" data-type="vvf" style="width: 20px; height: 20px; cursor: pointer;">
-    <span style="font-weight: 500;">⚠️ Assente / non conforme</span>
-   </label>
-  </div>
-  <div id="photo-btn-vvf-${item.id}" style="margin-top: 1rem; display: none;">
-   <button class="btn btn-secondary" onclick="capturePhoto(${item.id}, 'vvf')" style="width: 100%; justify-content: center;">📷 Scatta Foto VV.F.</button>
-  </div>
- </div>
-` : ``}
+                        <!-- Presenza segnaletica di riferimento -->
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-dark); border-radius: 0.75rem; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem;">
+                                Presenza segnaletica di riferimento
+                            </div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                Verifica la presenza della segnaletica di riferimento per l'apprestamento
+                            </div>
+                            
+                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                                <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="segnaletica-${item.id}" value="presente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">Presente</span>
+                                </label>
+                                
+                                <label style="flex: 1; min-width: 150px; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 2px solid transparent; transition: all 0.3s;" class="radio-label">
+                                    <input type="radio" name="segnaletica-${item.id}" value="assente" class="safety-radio" data-id="${item.id}" data-type="segnaletica"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 500;">Assente</span>
+                                </label>
+                            </div>
+                        </div>
 
-<div class="photo-preview" id="photos-${item.id}" style="margin-top: 1rem;"></div>
-                        
                         <div class="check-meta" id="meta-${item.id}"></div>
                     </div>
                 </div>
@@ -1766,45 +1881,23 @@
             
             if (!itemData.checks) {
                 itemData.checks = {
-                    segnaletica: null,
-                    illuminazione: null
+                    statoApprestamento: null,
+                    sigillo: null,
+                    segnaletica: null
                 };
             }
             
             itemData.checks[type] = value;
             
-            // Show/hide photo button based on selection
-            const photoBtnId = type === 'segnaletica' ? `photo-btn-seg-${id}` : (type === 'illuminazione' ? `photo-btn-ill-${id}` : `photo-btn-vvf-${id}`);
- const photoBtn = document.getElementById(photoBtnId);
-            if (photoBtn) {
-                if (value === 'manutenzione' || value === 'non_conforme') {
-                    photoBtn.style.display = 'block';
-                } else {
-                    photoBtn.style.display = 'none';
-                }
-            }
-            
-            // Update completed status - both must be answered
-            const requiresVVF = filteredNiches.find(n => n.id === id)?.isVvfSpecial;
- itemData.completed = itemData.checks.segnaletica !== null && itemData.checks.illuminazione !== null && (!requiresVVF || itemData.checks.vvf !== null);
+            // Update completed status - all three checks must be answered
+            itemData.completed = itemData.checks.statoApprestamento !== null && 
+                                itemData.checks.sigillo !== null && 
+                                itemData.checks.segnaletica !== null;
             
             if (itemData.completed && !itemData.timestamp) {
                 itemData.timestamp = new Date().toISOString();
             } else if (!itemData.completed) {
                 itemData.timestamp = null;
-            }
-            
-            // Check if maintenance selected but no photo yet
-            if (value === 'manutenzione' || value === 'non_conforme') {
-                const photos = itemData.photosByType?.[type] || [];
-                if (photos.length === 0) {
-                    itemData.needsPhoto = itemData.needsPhoto || {};
-                    itemData.needsPhoto[type] = true;
-                }
-            } else {
-                if (itemData.needsPhoto) {
-                    itemData.needsPhoto[type] = false;
-                }
             }
             
             const itemEl = document.getElementById(`item-${id}`);
@@ -1924,6 +2017,173 @@
             win.document.write(`<img src="${photo}" style="max-width: 100%; height: auto;">`);
         }
 
+        // Malfunction reporting functions
+        let currentMalfunctionPhoto = null;
+        
+        function openMalfunctionModal() {
+            document.getElementById('malfunctionModal').style.display = 'block';
+            resetMalfunctionForm();
+        }
+        
+        function closeMalfunctionModal() {
+            document.getElementById('malfunctionModal').style.display = 'none';
+            resetMalfunctionForm();
+        }
+        
+        function resetMalfunctionForm() {
+            // Reset all form fields
+            document.querySelectorAll('input[name="malfunctionType"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[name="lightingType"]').forEach(r => r.checked = false);
+            document.getElementById('kmMarker').value = '';
+            document.getElementById('bodyCount').value = '';
+            document.getElementById('malfunctionNotes').value = '';
+            document.getElementById('kmFields').style.display = 'none';
+            document.getElementById('photoFields').style.display = 'none';
+            document.getElementById('lightingFields').style.display = 'none';
+            document.getElementById('lightingBodyCount').style.display = 'none';
+            document.getElementById('malfunctionPhotoPreview').innerHTML = '';
+            currentMalfunctionPhoto = null;
+            
+            // Reset label borders
+            document.querySelectorAll('.malfunction-type-label').forEach(l => l.style.borderColor = 'transparent');
+        }
+        
+        function handleMalfunctionTypeChange() {
+            const selectedType = document.querySelector('input[name="malfunctionType"]:checked')?.value;
+            
+            // Visual feedback
+            document.querySelectorAll('.malfunction-type-label').forEach(l => l.style.borderColor = 'transparent');
+            if (selectedType) {
+                const selectedLabel = document.querySelector(`input[name="malfunctionType"][value="${selectedType}"]`).closest('.malfunction-type-label');
+                selectedLabel.style.borderColor = 'var(--primary)';
+            }
+            
+            // Show/hide fields based on type
+            if (selectedType === 'illuminazione') {
+                document.getElementById('lightingFields').style.display = 'block';
+                document.getElementById('photoFields').style.display = 'none';
+            } else if (selectedType) {
+                document.getElementById('lightingFields').style.display = 'none';
+                document.getElementById('photoFields').style.display = 'block';
+            }
+            
+            // Always show km field when type selected
+            if (selectedType) {
+                document.getElementById('kmFields').style.display = 'block';
+            }
+        }
+        
+        function handleLightingTypeChange() {
+            const lightingType = document.querySelector('input[name="lightingType"]:checked')?.value;
+            const bodyCountDiv = document.getElementById('lightingBodyCount');
+            
+            if (lightingType === 'corpi_illuminanti') {
+                bodyCountDiv.style.display = 'block';
+            } else {
+                bodyCountDiv.style.display = 'none';
+            }
+        }
+        
+        function captureMalfunctionPhoto() {
+            const input = document.getElementById('malfunctionCameraInput');
+            input.click();
+        }
+        
+        // Handle malfunction photo capture
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('malfunctionCameraInput')?.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentMalfunctionPhoto = event.target.result;
+                    document.getElementById('malfunctionPhotoPreview').innerHTML = 
+                        `<img src="${event.target.result}" style="width: 100%; max-height: 200px; object-fit: contain; border-radius: 0.5rem; border: 1px solid var(--border);" alt="Preview">`;
+                    showToast('Foto acquisita!', 'success');
+                };
+                reader.readAsDataURL(file);
+                e.target.value = ''; // Reset input
+            });
+        });
+        
+        function saveMalfunctionReport() {
+            const type = document.querySelector('input[name="malfunctionType"]:checked')?.value;
+            const kmMarker = document.getElementById('kmMarker').value.trim();
+            const notes = document.getElementById('malfunctionNotes').value.trim();
+            
+            // Validation
+            if (!type) {
+                showToast('Seleziona il tipo di malfunzionamento', 'error');
+                return;
+            }
+            
+            if (!kmMarker) {
+                showToast('Inserisci la progressiva chilometrica', 'error');
+                return;
+            }
+            
+            // Type-specific validation
+            if (type === 'illuminazione') {
+                const lightingType = document.querySelector('input[name="lightingType"]:checked')?.value;
+                if (!lightingType) {
+                    showToast('Specifica il tipo di guasto illuminazione', 'error');
+                    return;
+                }
+                
+                if (lightingType === 'corpi_illuminanti') {
+                    const bodyCount = document.getElementById('bodyCount').value;
+                    if (!bodyCount || bodyCount < 1) {
+                        showToast('Inserisci il numero di corpi non funzionanti', 'error');
+                        return;
+                    }
+                }
+            } else {
+                // Photo required for non-lighting types
+                if (!currentMalfunctionPhoto) {
+                    showToast('Scatta una foto del malfunzionamento', 'error');
+                    return;
+                }
+            }
+            
+            // Create malfunction report
+            const report = {
+                id: Date.now(),
+                type: type,
+                kmMarker: kmMarker,
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (type === 'illuminazione') {
+                report.lightingType = document.querySelector('input[name="lightingType"]:checked').value;
+                if (report.lightingType === 'corpi_illuminanti') {
+                    report.bodyCount = document.getElementById('bodyCount').value;
+                }
+            } else {
+                report.photo = currentMalfunctionPhoto;
+            }
+            
+            malfunctionReports.push(report);
+            updateMalfunctionCount();
+            saveToLocalStorage();
+            closeMalfunctionModal();
+            showToast('Segnalazione salvata con successo!', 'success');
+        }
+        
+        function updateMalfunctionCount() {
+            const count = malfunctionReports.length;
+            const countEl = document.getElementById('malfunctionCount');
+            if (count === 0) {
+                countEl.textContent = 'Nessuna segnalazione registrata';
+                countEl.style.color = 'var(--text-secondary)';
+            } else {
+                countEl.textContent = `${count} segnalazione${count > 1 ? 'i' : ''} registrata${count > 1 ? 'e' : ''}`;
+                countEl.style.color = 'var(--danger)';
+                countEl.style.fontWeight = '600';
+            }
+        }
+
         // Update meta information
         function updateMeta(id) {
             const itemData = checklistData.find(item => item.id === id);
@@ -1935,52 +2195,42 @@
                 const date = new Date(itemData.timestamp);
                 metaHtml += `
                     <div class="meta-item">
-                        <span class="meta-icon">🕐</span>
+                        <span class="meta-icon">⏱</span>
                         <span>${date.toLocaleString('it-IT')}</span>
                     </div>
                 `;
             }
             
             if (itemData.checks) {
-                if (itemData.checks.segnaletica) {
-                    const icon = itemData.checks.segnaletica === 'funzionante' ? '✅' : '⚠️';
+                if (itemData.checks.statoApprestamento) {
+                    const icon = itemData.checks.statoApprestamento === 'conforme' ? '✓' : '✗';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
-                            <span>Segnaletica: ${itemData.checks.segnaletica === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                            <span>Stato: ${itemData.checks.statoApprestamento === 'conforme' ? 'Conforme' : 'Non Conforme'}</span>
                         </div>
                     `;
                 }
                 
-                if (itemData.checks.vvf && (filteredNiches.find(n => n.id === id)?.isVvfSpecial)) {
-  const icon = itemData.checks.vvf === 'presente' ? '✅' : '⚠️';
-  metaHtml += `
-  <div class="meta-item">
-    <span class="meta-icon">${icon}</span>
-    <span>VV.F.: ${itemData.checks.vvf === 'presente' ? 'OK' : 'Non conforme'}</span>
-  </div>
-  `;
- }
- if (itemData.checks.illuminazione) {
-                    const icon = itemData.checks.illuminazione === 'funzionante' ? '✅' : '⚠️';
+                if (itemData.checks.sigillo) {
+                    const icon = itemData.checks.sigillo === 'integro' ? '✓' : '✗';
                     metaHtml += `
                         <div class="meta-item">
                             <span class="meta-icon">${icon}</span>
-                            <span>Illuminazione: ${itemData.checks.illuminazione === 'funzionante' ? 'OK' : 'Manutenzione'}</span>
+                            <span>Sigillo: ${itemData.checks.sigillo === 'integro' ? 'Integro' : 'Manomesso'}</span>
                         </div>
                     `;
                 }
-            }
-            
-            const photos = itemData.photosByType || {};
-            const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
-            if (totalPhotos > 0) {
-                metaHtml += `
-                    <div class="meta-item">
-                        <span class="meta-icon">📷</span>
-                        <span>${totalPhotos} foto</span>
-                    </div>
-                `;
+                
+                if (itemData.checks.segnaletica) {
+                    const icon = itemData.checks.segnaletica === 'presente' ? '✓' : '✗';
+                    metaHtml += `
+                        <div class="meta-item">
+                            <span class="meta-icon">${icon}</span>
+                            <span>Segnaletica: ${itemData.checks.segnaletica === 'presente' ? 'Presente' : 'Assente'}</span>
+                        </div>
+                    `;
+                }
             }
             
             container.innerHTML = metaHtml;
@@ -2059,6 +2309,206 @@ function updatePaginationUI() {
             }
         }
 
+        // Generate PDF report with photos
+        async function generatePDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPosition = 20;
+            const pageHeight = doc.internal.pageSize.height;
+            const pageWidth = doc.internal.pageSize.width;
+            const margin = 15;
+            const lineHeight = 7;
+            
+            // Helper function to check if we need a new page
+            function checkNewPage(needed = 10) {
+                if (yPosition + needed > pageHeight - 20) {
+                    doc.addPage();
+                    yPosition = 20;
+                    return true;
+                }
+                return false;
+            }
+            
+            // Title
+            doc.setFontSize(18);
+            doc.setFont(undefined, 'bold');
+            doc.text('REPORT VERIFICA APPRESTAMENTI', margin, yPosition);
+            yPosition += 10;
+            doc.setFontSize(16);
+            doc.text('TECNOLOGICI GALLERIA', margin, yPosition);
+            yPosition += 12;
+            
+            // Date and direction
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.text(`Data Ispezione: ${new Date().toLocaleString('it-IT')}`, margin, yPosition);
+            yPosition += lineHeight;
+            
+            const directionText = selectedDirection === 'san_benedetto' 
+                ? 'San Benedetto Val di Sambro (55+742)' 
+                : 'Vernio (37+200)';
+            doc.text(`Direzione: Verso ${directionText}`, margin, yPosition);
+            yPosition += lineHeight + 3;
+            
+            // Statistics
+            const totalNiches = checklistData.length;
+            const completedNiches = checklistData.filter(i => i.completed).length;
+            const nonConformNiches = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
+            }).length;
+            
+            doc.setFontSize(11);
+            doc.setFont(undefined, 'bold');
+            doc.text('RIEPILOGO:', margin, yPosition);
+            yPosition += lineHeight;
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(10);
+            doc.text(`Apprestamenti Verificati: ${completedNiches}/${totalNiches}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Apprestamenti Non Conformi: ${nonConformNiches}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Segnalazioni Malfunzionamenti: ${malfunctionReports.length}`, margin + 5, yPosition);
+            yPosition += lineHeight;
+            doc.text(`Percentuale Completamento: ${Math.round((completedNiches/totalNiches)*100)}%`, margin + 5, yPosition);
+            yPosition += 10;
+            
+            // Non-conforming niches
+            const nichesNonConform = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
+            });
+            
+            if (nichesNonConform.length > 0) {
+                checkNewPage(20);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('APPRESTAMENTI NON CONFORMI', margin, yPosition);
+                yPosition += 8;
+                
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                
+                nichesNonConform.forEach((item) => {
+                    checkNewPage(25);
+                    const niche = filteredNiches.find(n => n.id === item.id);
+                    
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${niche.km} - Binario ${niche.binario}`, margin, yPosition);
+                    yPosition += lineHeight;
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`${niche.description}`, margin + 5, yPosition);
+                    yPosition += lineHeight;
+                    
+                    if (item.checks.statoApprestamento === 'non_conforme') {
+                        doc.text(`[!] STATO APPRESTAMENTO - Non Conforme`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    if (item.checks.sigillo === 'manomesso') {
+                        doc.text(`[!] SIGILLO - Manomesso`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    if (item.checks.segnaletica === 'assente') {
+                        doc.text(`[!] SEGNALETICA - Assente`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    yPosition += 5;
+                });
+                
+                yPosition += 5;
+            }
+            
+            // Malfunction reports with photos
+            if (malfunctionReports.length > 0) {
+                checkNewPage(20);
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('SEGNALAZIONI MALFUNZIONAMENTI', margin, yPosition);
+                yPosition += 10;
+                
+                doc.setFontSize(10);
+                
+                for (let i = 0; i < malfunctionReports.length; i++) {
+                    const malfunction = malfunctionReports[i];
+                    checkNewPage(70);
+                    
+                    doc.setFont(undefined, 'bold');
+                    const typeLabels = {
+                        'camminamento': 'CAMMINAMENTO',
+                        'corrimano': 'CORRIMANO',
+                        'segnaletica_uscita': 'SEGNALETICA DI USCITA',
+                        'illuminazione': 'IMPIANTO DI ILLUMINAZIONE'
+                    };
+                    doc.text(`${i + 1}. ${typeLabels[malfunction.type]}`, margin, yPosition);
+                    yPosition += lineHeight;
+                    
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Progressiva: ${malfunction.kmMarker}`, margin + 5, yPosition);
+                    yPosition += lineHeight;
+                    
+                    if (malfunction.type === 'illuminazione') {
+                        const lightingLabels = {
+                            'fungo_blu': 'Fungo Blu',
+                            'corpi_illuminanti': 'Corpi Illuminanti'
+                        };
+                        doc.text(`Tipo Guasto: ${lightingLabels[malfunction.lightingType]}`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                        
+                        if (malfunction.lightingType === 'corpi_illuminanti' && malfunction.bodyCount) {
+                            doc.text(`Numero Corpi Non Funzionanti: ${malfunction.bodyCount}`, margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        }
+                    }
+                    
+                    if (malfunction.notes) {
+                        const notesLines = doc.splitTextToSize(`Note: ${malfunction.notes}`, pageWidth - margin * 2 - 10);
+                        notesLines.forEach(line => {
+                            checkNewPage();
+                            doc.text(line, margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        });
+                    }
+                    
+                    if (malfunction.timestamp) {
+                        doc.text(`Segnalato: ${new Date(malfunction.timestamp).toLocaleString('it-IT')}`, margin + 5, yPosition);
+                        yPosition += lineHeight;
+                    }
+                    
+                    // Add photo if available
+                    if (malfunction.photo) {
+                        checkNewPage(80);
+                        yPosition += 3;
+                        try {
+                            // Add photo to PDF
+                            const imgWidth = pageWidth - margin * 2;
+                            const imgHeight = 60;
+                            doc.addImage(malfunction.photo, 'JPEG', margin, yPosition, imgWidth, imgHeight);
+                            yPosition += imgHeight + 5;
+                        } catch (e) {
+                            doc.text('[Errore nel caricamento della foto]', margin + 5, yPosition);
+                            yPosition += lineHeight;
+                        }
+                    }
+                    
+                    yPosition += 5;
+                }
+            }
+            
+            // Footer
+            checkNewPage(15);
+            doc.setFontSize(9);
+            doc.setFont(undefined, 'italic');
+            doc.text(`Generato da Monitoraggio Galleria - ${new Date().toLocaleString('it-IT')}`, margin, yPosition);
+            
+            return doc;
+        }
+
         // Submit report
         async function submitReport() {
             if (!isOnline) {
@@ -2072,33 +2522,58 @@ function updatePaginationUI() {
                 return;
             }
             
+            // Generate text report
             const report = generateReport();
             
-            // In a real implementation, you would send this to a backend API
-            // For this demo, we'll use mailto: as a fallback
-            const subject = encodeURIComponent(`Report Checklist - ${new Date().toLocaleDateString('it-IT')}`);
-            const body = encodeURIComponent(report);
+            // Generate PDF
+            showToast('Generazione PDF in corso...', 'info');
             
-            // Show success message
-            showToast('Report generato! Apertura client email...', 'success');
-            
-            // Open mailto
-            setTimeout(() => {
-                window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-            }, 1000);
-            
-            // Clear data after successful submission
-            setTimeout(() => {
-                if (confirm('Report inviato! Vuoi cancellare i dati locali?')) {
-                    localStorage.removeItem('checklistData');
-                    location.reload();
-                }
-            }, 2000);
+            try {
+                const pdfDoc = await generatePDFReport();
+                
+                // Generate filename with date
+                const dateStr = new Date().toISOString().split('T')[0];
+                const filename = `Report_Galleria_${dateStr}.pdf`;
+                
+                // Save PDF file
+                pdfDoc.save(filename);
+                
+                // Show success message with instructions
+                showToast('PDF generato e scaricato! Allega il file alla email.', 'success');
+                
+                // Open mailto with text report in body
+                const subject = encodeURIComponent(`Report Verifica Galleria - ${new Date().toLocaleDateString('it-IT')}`);
+                const body = encodeURIComponent(`${report}\n\n[Si prega di allegare il file PDF scaricato]`);
+                
+                setTimeout(() => {
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }, 1500);
+                
+                // Clear data after successful submission
+                setTimeout(() => {
+                    if (confirm('Report generato! Vuoi cancellare i dati locali e ricominciare?')) {
+                        localStorage.removeItem('checklistData');
+                        localStorage.removeItem('malfunctionReports');
+                        location.reload();
+                    }
+                }, 3000);
+            } catch (error) {
+                console.error('Errore generazione PDF:', error);
+                showToast('Errore nella generazione del PDF. Invio solo report testuale.', 'error');
+                
+                // Fallback to text-only email
+                const subject = encodeURIComponent(`Report Verifica Galleria - ${new Date().toLocaleDateString('it-IT')}`);
+                const body = encodeURIComponent(report);
+                
+                setTimeout(() => {
+                    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                }, 1000);
+            }
         }
 
         // Generate report
         function generateReport() {
-            let report = 'REPORT VERIFICA NICCHIE DI SICUREZZA GALLERIA\n';
+            let report = 'REPORT VERIFICA APPRESTAMENTI TECNOLOGICI GALLERIA\n';
             report += `Data Ispezione: ${new Date().toLocaleString('it-IT')}\n`;
             
             const directionText = selectedDirection === 'san_benedetto' 
@@ -2108,46 +2583,43 @@ function updatePaginationUI() {
             
             const totalNiches = checklistData.length;
             const completedNiches = checklistData.filter(i => i.completed).length;
-            const needsMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+            const nonConformNiches = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
             }).length;
             
-            report += `Nicchie Verificate: ${completedNiches}/${totalNiches}\n`;
-            report += `Nicchie Necessitano Manutenzione: ${needsMaintenance}\n`;
+            report += `Apprestamenti Verificati: ${completedNiches}/${totalNiches}\n`;
+            report += `Apprestamenti Non Conformi: ${nonConformNiches}\n`;
+            report += `Segnalazioni Malfunzionamenti: ${malfunctionReports.length}\n`;
             report += `Percentuale Completamento: ${Math.round((completedNiches/totalNiches)*100)}%\n\n`;
             
             report += '='.repeat(60) + '\n\n';
             
-            // Summary of maintenance needed
-            const nichesNeedingMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+            // Summary of non-conforming niches
+            const nichesNonConform = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
             });
             
-            if (nichesNeedingMaintenance.length > 0) {
-                report += 'RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE\n\n';
+            if (nichesNonConform.length > 0) {
+                report += 'RIEPILOGO APPRESTAMENTI NON CONFORMI\n\n';
                 
-                nichesNeedingMaintenance.forEach((item) => {
+                nichesNonConform.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    report += `📍 ${niche.km} - Binario ${niche.binario}\n`;
+                    report += `${niche.km} - Binario ${niche.binario} - ${niche.description}\n`;
                     
-                    if (item.checks.segnaletica === 'manutenzione') {
-                        const photoCount = item.photosByType?.segnaletica?.length || 0;
-                        report += `   ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione`;
-                        if (photoCount > 0) report += ` (${photoCount} foto)`;
-                        report += '\n';
+                    if (item.checks.statoApprestamento === 'non_conforme') {
+                        report += `   [!] STATO APPRESTAMENTO - Non Conforme\n`;
                     }
                     
-                    if (item.checks.vvf === 'non_conforme') {
- const photoCount = item.photosByType?.vvf?.length || 0;
- report += ` ⚠️ ANTINCENDIO VV.F. (MANICHETTE + SEGNALETICA) - Assente / non conforme`;
- if (photoCount > 0) report += ` (${photoCount} foto)`;
- report += '\n';
- }
- if (item.checks.illuminazione === 'manutenzione') {
-                        const photoCount = item.photosByType?.illuminazione?.length || 0;
-                        report += `   ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione`;
-                        if (photoCount > 0) report += ` (${photoCount} foto)`;
-                        report += '\n';
+                    if (item.checks.sigillo === 'manomesso') {
+                        report += `   [!] SIGILLO - Manomesso\n`;
+                    }
+                    
+                    if (item.checks.segnaletica === 'assente') {
+                        report += `   [!] SEGNALETICA DI RIFERIMENTO - Assente\n`;
                     }
                     
                     if (item.timestamp) {
@@ -2159,26 +2631,73 @@ function updatePaginationUI() {
                 report += '='.repeat(60) + '\n\n';
             }
             
-            // Detailed list
-            report += 'DETTAGLIO COMPLETO NICCHIE\n\n';
+            // Malfunction reports summary
+            if (malfunctionReports.length > 0) {
+                report += 'SEGNALAZIONI MALFUNZIONAMENTI\n\n';
+                
+                malfunctionReports.forEach((malfunction, index) => {
+                    report += `${index + 1}. `;
+                    
+                    // Type label
+                    const typeLabels = {
+                        'camminamento': 'CAMMINAMENTO',
+                        'corrimano': 'CORRIMANO',
+                        'segnaletica_uscita': 'SEGNALETICA DI USCITA',
+                        'illuminazione': 'IMPIANTO DI ILLUMINAZIONE'
+                    };
+                    report += `${typeLabels[malfunction.type]}\n`;
+                    report += `   Progressiva: ${malfunction.kmMarker}\n`;
+                    
+                    // Lighting specific details
+                    if (malfunction.type === 'illuminazione') {
+                        const lightingLabels = {
+                            'fungo_blu': 'Fungo Blu',
+                            'corpi_illuminanti': 'Corpi Illuminanti'
+                        };
+                        report += `   Tipo Guasto: ${lightingLabels[malfunction.lightingType]}\n`;
+                        
+                        if (malfunction.lightingType === 'corpi_illuminanti' && malfunction.bodyCount) {
+                            report += `   Numero Corpi Non Funzionanti: ${malfunction.bodyCount}\n`;
+                        }
+                    } else {
+                        report += `   Foto Allegata: Sì\n`;
+                    }
+                    
+                    if (malfunction.notes) {
+                        report += `   Note: ${malfunction.notes}\n`;
+                    }
+                    
+                    if (malfunction.timestamp) {
+                        report += `   Segnalato: ${new Date(malfunction.timestamp).toLocaleString('it-IT')}\n`;
+                    }
+                    
+                    report += '\n';
+                });
+                
+                report += '='.repeat(60) + '\n\n';
+            }
+            
+            // Detailed list of all niches
+            report += 'DETTAGLIO COMPLETO APPRESTAMENTI TECNOLOGICI\n\n';
             
             checklistData.forEach((item, index) => {
                 const niche = filteredNiches.find(n => n.id === item.id);
                 report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario}\n`;
-                report += `   Stato: ${item.completed ? '✅ VERIFICATA' : '⏳ DA VERIFICARE'}\n`;
+                report += `   Tipo: ${niche.description}\n`;
+                report += `   Stato: ${item.completed ? '✅ VERIFICATO' : '⏳ DA VERIFICARE'}\n`;
                 
                 if (item.checks) {
-                    if (item.checks.segnaletica) {
-                        const status = item.checks.segnaletica === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Segnaletica Uscite Emergenza: ${status}\n`;
+                    if (item.checks.statoApprestamento) {
+                        const status = item.checks.statoApprestamento === 'conforme' ? '[OK] Conforme' : '[!] Non Conforme';
+                        report += `   Stato Apprestamento: ${status}\n`;
                     }
-                    if (item.checks.vvf && (filteredNiches.find(n => n.id === item.id)?.isVvfSpecial)) {
- const status = item.checks.vvf === 'presente' ? '✅ Presente e segnaletica OK' : '⚠️ Assente / non conforme';
- report += ` Antincendio VV.F. (manichette + segnaletica): ${status}\n`;
- }
- if (item.checks.illuminazione) {
-                        const status = item.checks.illuminazione === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Illuminazione Emergenza (12,5m): ${status}\n`;
+                    if (item.checks.sigillo) {
+                        const status = item.checks.sigillo === 'integro' ? '[OK] Integro' : '[!] Manomesso';
+                        report += `   Sigillo: ${status}\n`;
+                    }
+                    if (item.checks.segnaletica) {
+                        const status = item.checks.segnaletica === 'presente' ? '[OK] Presente' : '[!] Assente';
+                        report += `   Segnaletica di Riferimento: ${status}\n`;
                     }
                 }
                 
@@ -2186,24 +2705,18 @@ function updatePaginationUI() {
                     report += `   Data Verifica: ${new Date(item.timestamp).toLocaleString('it-IT')}\n`;
                 }
                 
-                const photos = item.photosByType || {};
-                const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
-                if (totalPhotos > 0) {
-                    report += `   Foto Allegate: ${totalPhotos}\n`;
-                    if (photos.segnaletica?.length > 0) report += `     - Segnaletica: ${photos.segnaletica.length}\n`;
-                    if (photos.illuminazione?.length > 0) report += `     - Illuminazione: ${photos.illuminazione.length}\n`;
-                    if (photos.general?.length > 0) report += `     - Generali: ${photos.general.length}\n`;
-                }
-                
                 report += '\n';
             });
             
             report += '\n='.repeat(60) + '\n';
             report += 'Note Tecniche:\n';
-            report += '- Segnaletica: Indica le uscite di emergenza in galleria\n';
-            report += '- Illuminazione: Corpi illuminanti sopra corrimano a distanza 12,5m\n';
+            report += '- Apprestamenti Tecnologici: Idranti VVF, Colonnine TEM, Quadri di soccorso VVF\n';
+            report += '- Per ogni apprestamento: verificato stato, sigillo e segnaletica\n';
+            if (malfunctionReports.length > 0) {
+                report += `- Segnalati ${malfunctionReports.length} malfunzionamenti infrastrutturali\n`;
+            }
             report += '\nFine Report\n';
-            report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
+            report += `Generato da Monitoraggio Galleria - ${new Date().toLocaleString('it-IT')}\n`;
             
             return report;
         }
@@ -2211,6 +2724,7 @@ function updatePaginationUI() {
         // LocalStorage functions
         function saveToLocalStorage() {
             localStorage.setItem('checklistData', JSON.stringify(checklistData));
+            localStorage.setItem('malfunctionReports', JSON.stringify(malfunctionReports));
         }
 
         function loadFromLocalStorage() {
@@ -2223,69 +2737,40 @@ function updatePaginationUI() {
                     if (item) {
                         Object.assign(item, savedItem);
                         
-                        // Ensure checks object exists
+                        // Ensure checks object exists with new structure
                         if (!item.checks) {
                             item.checks = {
-                                segnaletica: null,
-                                illuminazione: null
+                                statoApprestamento: null,
+                                sigillo: null,
+                                segnaletica: null
                             };
                         }
                         
-                        // Ensure photosByType exists
-                        if (!item.photosByType) {
-                            item.photosByType = {
-                                segnaletica: [],
-                                illuminazione: [],
-                                general: []
-                            };
+                        // Update UI radio buttons for new checks
+                        if (item.checks.statoApprestamento) {
+                            const radio = document.querySelector(`input[name="statoApprestamento-${item.id}"][value="${item.checks.statoApprestamento}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                const label = radio.closest('.radio-label');
+                                if (label) label.style.borderColor = 'var(--primary)';
+                            }
                         }
                         
-                        // Ensure needsPhoto exists
-                        if (!item.needsPhoto) {
-                            item.needsPhoto = {
-                                segnaletica: false,
-                                illuminazione: false
-                            };
+                        if (item.checks.sigillo) {
+                            const radio = document.querySelector(`input[name="sigillo-${item.id}"][value="${item.checks.sigillo}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                const label = radio.closest('.radio-label');
+                                if (label) label.style.borderColor = 'var(--primary)';
+                            }
                         }
                         
-                        // Update UI radio buttons
                         if (item.checks.segnaletica) {
                             const radio = document.querySelector(`input[name="segnaletica-${item.id}"][value="${item.checks.segnaletica}"]`);
                             if (radio) {
                                 radio.checked = true;
                                 const label = radio.closest('.radio-label');
                                 if (label) label.style.borderColor = 'var(--primary)';
-                                
-                                // Show photo button if needed
-                                if (item.checks.segnaletica === 'manutenzione') {
-                                    const photoBtn = document.getElementById(`photo-btn-seg-${item.id}`);
-                                    if (photoBtn) photoBtn.style.display = 'block';
-                                }
-                            }
-                        }
-                        
-                        if (item.checks.vvf && (filteredNiches.find(n => n.id === item.id)?.isVvfSpecial)) {
- const status = item.checks.vvf === 'presente' ? '✅ Presente e segnaletica OK' : '⚠️ Assente / non conforme';
- report += ` Antincendio VV.F. (manichette + segnaletica): ${status}\n`;
- }
- if (item.checks.illuminazione) {
-                            const radio = document.querySelector(`input[name="illuminazione-${item.id}"][value="${item.checks.illuminazione}"]`);
-                            if (radio) {
-                                radio.checked = true;
-                                const label = radio.closest('.radio-label');
-                                if (label) label.style.borderColor = 'var(--primary)';
-                                
-                                // Show photo button if needed
-                                if (item.checks.vvf === 'non_conforme') {
- const photoCount = item.photosByType?.vvf?.length || 0;
- report += ` ⚠️ ANTINCENDIO VV.F. (MANICHETTE + SEGNALETICA) - Assente / non conforme`;
- if (photoCount > 0) report += ` (${photoCount} foto)`;
- report += '\n';
- }
- if (item.checks.illuminazione === 'manutenzione') {
-                                    const photoBtn = document.getElementById(`photo-btn-ill-${item.id}`);
-                                    if (photoBtn) photoBtn.style.display = 'block';
-                                }
                             }
                         }
                         
@@ -2295,11 +2780,17 @@ function updatePaginationUI() {
                         }
                         
                         updateMeta(item.id);
-                        displayPhotos(item.id);
                     }
                 });
                 
                 updateProgress();
+            }
+            
+            // Load malfunction reports
+            const savedMalfunctions = localStorage.getItem('malfunctionReports');
+            if (savedMalfunctions) {
+                malfunctionReports = JSON.parse(savedMalfunctions);
+                updateMalfunctionCount();
             }
         }
 
