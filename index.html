@@ -2354,7 +2354,7 @@ function updatePaginationUI() {
 
         // Generate report
         function generateReport() {
-            let report = 'REPORT VERIFICA NICCHIE DI SICUREZZA GALLERIA\n';
+            let report = 'REPORT VERIFICA APPRESTAMENTI TECNOLOGICI GALLERIA\n';
             report += `Data Ispezione: ${new Date().toLocaleString('it-IT')}\n`;
             
             const directionText = selectedDirection === 'san_benedetto' 
@@ -2364,46 +2364,43 @@ function updatePaginationUI() {
             
             const totalNiches = checklistData.length;
             const completedNiches = checklistData.filter(i => i.completed).length;
-            const needsMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+            const nonConformNiches = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
             }).length;
             
-            report += `Nicchie Verificate: ${completedNiches}/${totalNiches}\n`;
-            report += `Nicchie Necessitano Manutenzione: ${needsMaintenance}\n`;
+            report += `Apprestamenti Verificati: ${completedNiches}/${totalNiches}\n`;
+            report += `Apprestamenti Non Conformi: ${nonConformNiches}\n`;
+            report += `Segnalazioni Malfunzionamenti: ${malfunctionReports.length}\n`;
             report += `Percentuale Completamento: ${Math.round((completedNiches/totalNiches)*100)}%\n\n`;
             
             report += '='.repeat(60) + '\n\n';
             
-            // Summary of maintenance needed
-            const nichesNeedingMaintenance = checklistData.filter(i => {
-                return i.checks?.segnaletica === 'manutenzione' || i.checks?.illuminazione === 'manutenzione' || i.checks?.vvf === 'non_conforme';
+            // Summary of non-conforming niches
+            const nichesNonConform = checklistData.filter(i => {
+                return i.checks?.statoApprestamento === 'non_conforme' || 
+                       i.checks?.sigillo === 'manomesso' || 
+                       i.checks?.segnaletica === 'assente';
             });
             
-            if (nichesNeedingMaintenance.length > 0) {
-                report += 'RIEPILOGO NICCHIE CHE NECESSITANO MANUTENZIONE\n\n';
+            if (nichesNonConform.length > 0) {
+                report += 'RIEPILOGO APPRESTAMENTI NON CONFORMI\n\n';
                 
-                nichesNeedingMaintenance.forEach((item) => {
+                nichesNonConform.forEach((item) => {
                     const niche = filteredNiches.find(n => n.id === item.id);
-                    report += `📍 ${niche.km} - Binario ${niche.binario}\n`;
+                    report += `📍 ${niche.km} - Binario ${niche.binario} - ${niche.description}\n`;
                     
-                    if (item.checks.segnaletica === 'manutenzione') {
-                        const photoCount = item.photosByType?.segnaletica?.length || 0;
-                        report += `   ⚠️ SEGNALETICA USCITE EMERGENZA - Necessita Manutenzione`;
-                        if (photoCount > 0) report += ` (${photoCount} foto)`;
-                        report += '\n';
+                    if (item.checks.statoApprestamento === 'non_conforme') {
+                        report += `   ⚠️ STATO APPRESTAMENTO - Non Conforme\n`;
                     }
                     
-                    if (item.checks.vvf === 'non_conforme') {
- const photoCount = item.photosByType?.vvf?.length || 0;
- report += ` ⚠️ ANTINCENDIO VV.F. (MANICHETTE + SEGNALETICA) - Assente / non conforme`;
- if (photoCount > 0) report += ` (${photoCount} foto)`;
- report += '\n';
- }
- if (item.checks.illuminazione === 'manutenzione') {
-                        const photoCount = item.photosByType?.illuminazione?.length || 0;
-                        report += `   ⚠️ ILLUMINAZIONE EMERGENZA - Necessita Manutenzione`;
-                        if (photoCount > 0) report += ` (${photoCount} foto)`;
-                        report += '\n';
+                    if (item.checks.sigillo === 'manomesso') {
+                        report += `   ⚠️ SIGILLO - Manomesso\n`;
+                    }
+                    
+                    if (item.checks.segnaletica === 'assente') {
+                        report += `   ⚠️ SEGNALETICA DI RIFERIMENTO - Assente\n`;
                     }
                     
                     if (item.timestamp) {
@@ -2415,26 +2412,73 @@ function updatePaginationUI() {
                 report += '='.repeat(60) + '\n\n';
             }
             
-            // Detailed list
-            report += 'DETTAGLIO COMPLETO NICCHIE\n\n';
+            // Malfunction reports summary
+            if (malfunctionReports.length > 0) {
+                report += 'SEGNALAZIONI MALFUNZIONAMENTI\n\n';
+                
+                malfunctionReports.forEach((malfunction, index) => {
+                    report += `${index + 1}. `;
+                    
+                    // Type label
+                    const typeLabels = {
+                        'camminamento': '🚶 CAMMINAMENTO',
+                        'corrimano': '🤝 CORRIMANO',
+                        'segnaletica_uscita': '🚪 SEGNALETICA DI USCITA',
+                        'illuminazione': '💡 IMPIANTO DI ILLUMINAZIONE'
+                    };
+                    report += `${typeLabels[malfunction.type]}\n`;
+                    report += `   Progressiva: ${malfunction.kmMarker}\n`;
+                    
+                    // Lighting specific details
+                    if (malfunction.type === 'illuminazione') {
+                        const lightingLabels = {
+                            'fungo_blu': 'Fungo Blu',
+                            'corpi_illuminanti': 'Corpi Illuminanti'
+                        };
+                        report += `   Tipo Guasto: ${lightingLabels[malfunction.lightingType]}\n`;
+                        
+                        if (malfunction.lightingType === 'corpi_illuminanti' && malfunction.bodyCount) {
+                            report += `   Numero Corpi Non Funzionanti: ${malfunction.bodyCount}\n`;
+                        }
+                    } else {
+                        report += `   Foto Allegata: Sì\n`;
+                    }
+                    
+                    if (malfunction.notes) {
+                        report += `   Note: ${malfunction.notes}\n`;
+                    }
+                    
+                    if (malfunction.timestamp) {
+                        report += `   Segnalato: ${new Date(malfunction.timestamp).toLocaleString('it-IT')}\n`;
+                    }
+                    
+                    report += '\n';
+                });
+                
+                report += '='.repeat(60) + '\n\n';
+            }
+            
+            // Detailed list of all niches
+            report += 'DETTAGLIO COMPLETO APPRESTAMENTI TECNOLOGICI\n\n';
             
             checklistData.forEach((item, index) => {
                 const niche = filteredNiches.find(n => n.id === item.id);
                 report += `${index + 1}. Km ${niche.km} - Binario ${niche.binario}\n`;
-                report += `   Stato: ${item.completed ? '✅ VERIFICATA' : '⏳ DA VERIFICARE'}\n`;
+                report += `   Tipo: ${niche.description}\n`;
+                report += `   Stato: ${item.completed ? '✅ VERIFICATO' : '⏳ DA VERIFICARE'}\n`;
                 
                 if (item.checks) {
-                    if (item.checks.segnaletica) {
-                        const status = item.checks.segnaletica === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Segnaletica Uscite Emergenza: ${status}\n`;
+                    if (item.checks.statoApprestamento) {
+                        const status = item.checks.statoApprestamento === 'conforme' ? '✅ Conforme' : '⚠️ Non Conforme';
+                        report += `   Stato Apprestamento: ${status}\n`;
                     }
-                    if (item.checks.vvf && (filteredNiches.find(n => n.id === item.id)?.isVvfSpecial)) {
- const status = item.checks.vvf === 'presente' ? '✅ Presente e segnaletica OK' : '⚠️ Assente / non conforme';
- report += ` Antincendio VV.F. (manichette + segnaletica): ${status}\n`;
- }
- if (item.checks.illuminazione) {
-                        const status = item.checks.illuminazione === 'funzionante' ? '✅ Funzionante' : '⚠️ Necessita Manutenzione';
-                        report += `   Illuminazione Emergenza (12,5m): ${status}\n`;
+                    if (item.checks.sigillo) {
+                        const status = item.checks.sigillo === 'integro' ? '✅ Integro' : '⚠️ Manomesso';
+                        report += `   Sigillo: ${status}\n`;
+                    }
+                    if (item.checks.segnaletica) {
+                        const status = item.checks.segnaletica === 'presente' ? '✅ Presente' : '⚠️ Assente';
+                        report += `   Segnaletica di Riferimento: ${status}\n`;
                     }
                 }
                 
@@ -2442,22 +2486,16 @@ function updatePaginationUI() {
                     report += `   Data Verifica: ${new Date(item.timestamp).toLocaleString('it-IT')}\n`;
                 }
                 
-                const photos = item.photosByType || {};
-                const totalPhotos = (photos.segnaletica?.length || 0) + (photos.illuminazione?.length || 0) + (photos.vvf?.length || 0);
-                if (totalPhotos > 0) {
-                    report += `   Foto Allegate: ${totalPhotos}\n`;
-                    if (photos.segnaletica?.length > 0) report += `     - Segnaletica: ${photos.segnaletica.length}\n`;
-                    if (photos.illuminazione?.length > 0) report += `     - Illuminazione: ${photos.illuminazione.length}\n`;
-                    if (photos.general?.length > 0) report += `     - Generali: ${photos.general.length}\n`;
-                }
-                
                 report += '\n';
             });
             
             report += '\n='.repeat(60) + '\n';
             report += 'Note Tecniche:\n';
-            report += '- Segnaletica: Indica le uscite di emergenza in galleria\n';
-            report += '- Illuminazione: Corpi illuminanti sopra corrimano a distanza 12,5m\n';
+            report += '- Apprestamenti Tecnologici: Idranti VVF, Colonnine TEM, Quadri di soccorso VVF\n';
+            report += '- Per ogni apprestamento: verificato stato, sigillo e segnaletica\n';
+            if (malfunctionReports.length > 0) {
+                report += `- Segnalati ${malfunctionReports.length} malfunzionamenti infrastrutturali\n`;
+            }
             report += '\nFine Report\n';
             report += `Generato da NicheSafe - ${new Date().toLocaleString('it-IT')}\n`;
             
@@ -2467,6 +2505,7 @@ function updatePaginationUI() {
         // LocalStorage functions
         function saveToLocalStorage() {
             localStorage.setItem('checklistData', JSON.stringify(checklistData));
+            localStorage.setItem('malfunctionReports', JSON.stringify(malfunctionReports));
         }
 
         function loadFromLocalStorage() {
@@ -2479,69 +2518,40 @@ function updatePaginationUI() {
                     if (item) {
                         Object.assign(item, savedItem);
                         
-                        // Ensure checks object exists
+                        // Ensure checks object exists with new structure
                         if (!item.checks) {
                             item.checks = {
-                                segnaletica: null,
-                                illuminazione: null
+                                statoApprestamento: null,
+                                sigillo: null,
+                                segnaletica: null
                             };
                         }
                         
-                        // Ensure photosByType exists
-                        if (!item.photosByType) {
-                            item.photosByType = {
-                                segnaletica: [],
-                                illuminazione: [],
-                                general: []
-                            };
+                        // Update UI radio buttons for new checks
+                        if (item.checks.statoApprestamento) {
+                            const radio = document.querySelector(`input[name="statoApprestamento-${item.id}"][value="${item.checks.statoApprestamento}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                const label = radio.closest('.radio-label');
+                                if (label) label.style.borderColor = 'var(--primary)';
+                            }
                         }
                         
-                        // Ensure needsPhoto exists
-                        if (!item.needsPhoto) {
-                            item.needsPhoto = {
-                                segnaletica: false,
-                                illuminazione: false
-                            };
+                        if (item.checks.sigillo) {
+                            const radio = document.querySelector(`input[name="sigillo-${item.id}"][value="${item.checks.sigillo}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                const label = radio.closest('.radio-label');
+                                if (label) label.style.borderColor = 'var(--primary)';
+                            }
                         }
                         
-                        // Update UI radio buttons
                         if (item.checks.segnaletica) {
                             const radio = document.querySelector(`input[name="segnaletica-${item.id}"][value="${item.checks.segnaletica}"]`);
                             if (radio) {
                                 radio.checked = true;
                                 const label = radio.closest('.radio-label');
                                 if (label) label.style.borderColor = 'var(--primary)';
-                                
-                                // Show photo button if needed
-                                if (item.checks.segnaletica === 'manutenzione') {
-                                    const photoBtn = document.getElementById(`photo-btn-seg-${item.id}`);
-                                    if (photoBtn) photoBtn.style.display = 'block';
-                                }
-                            }
-                        }
-                        
-                        if (item.checks.vvf && (filteredNiches.find(n => n.id === item.id)?.isVvfSpecial)) {
- const status = item.checks.vvf === 'presente' ? '✅ Presente e segnaletica OK' : '⚠️ Assente / non conforme';
- report += ` Antincendio VV.F. (manichette + segnaletica): ${status}\n`;
- }
- if (item.checks.illuminazione) {
-                            const radio = document.querySelector(`input[name="illuminazione-${item.id}"][value="${item.checks.illuminazione}"]`);
-                            if (radio) {
-                                radio.checked = true;
-                                const label = radio.closest('.radio-label');
-                                if (label) label.style.borderColor = 'var(--primary)';
-                                
-                                // Show photo button if needed
-                                if (item.checks.vvf === 'non_conforme') {
- const photoCount = item.photosByType?.vvf?.length || 0;
- report += ` ⚠️ ANTINCENDIO VV.F. (MANICHETTE + SEGNALETICA) - Assente / non conforme`;
- if (photoCount > 0) report += ` (${photoCount} foto)`;
- report += '\n';
- }
- if (item.checks.illuminazione === 'manutenzione') {
-                                    const photoBtn = document.getElementById(`photo-btn-ill-${item.id}`);
-                                    if (photoBtn) photoBtn.style.display = 'block';
-                                }
                             }
                         }
                         
@@ -2551,11 +2561,17 @@ function updatePaginationUI() {
                         }
                         
                         updateMeta(item.id);
-                        displayPhotos(item.id);
                     }
                 });
                 
                 updateProgress();
+            }
+            
+            // Load malfunction reports
+            const savedMalfunctions = localStorage.getItem('malfunctionReports');
+            if (savedMalfunctions) {
+                malfunctionReports = JSON.parse(savedMalfunctions);
+                updateMalfunctionCount();
             }
         }
 
